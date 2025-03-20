@@ -68,8 +68,9 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.07);
             background: white;
             transform: scale(0.65);
-            transform-origin: top center;
+            transform-origin: top left;
             margin-bottom: -15%;
+            margin-right: -15%;
         }
 
         th, td {
@@ -280,6 +281,9 @@
 
         .quarter-content.active {
             display: block;
+            overflow-x: auto;
+            width: 100%;
+            padding-bottom: 15px; /* 下部にスクロールバーのスペースを確保 */
         }
 
         /* オプションメニュー */
@@ -727,10 +731,10 @@
             
             /* テーブルのレイアウト調整 */
             table {
-                table-layout: fixed;
-                font-size: 0.9em;
                 transform: scale(0.6);
+                transform-origin: top left;
                 margin-bottom: -20%;
+                margin-right: -20%;
             }
             
             th, td {
@@ -794,9 +798,10 @@
             }
             
             table {
-                min-width: 450px; /* 最小幅を設定 */
                 transform: scale(0.5);
+                transform-origin: top left;
                 margin-bottom: -25%;
+                margin-right: -25%;
             }
             
             .time-col {
