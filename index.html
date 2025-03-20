@@ -17,7 +17,7 @@
             font-family: 'Roboto', 'Segoe UI', 'Helvetica', 'Arial', sans-serif;
             color: #333;
             margin: 0;
-            padding: 30px;
+            padding: 15px;
             background-color: #f0f3f8;
             line-height: 1.6;
             background-image: linear-gradient(to bottom right, rgba(240,243,248,1) 0%, rgba(220,230,245,1) 100%);
@@ -27,20 +27,20 @@
         .container {
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 15px;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
-        
+
         h1 {
             text-align: center;
             color: #1a237e;
-            margin-bottom: 25px;
-            font-size: 2.3em;
+            margin-bottom: 8px;
+            font-size: 1.5em;
             font-weight: 700;
             letter-spacing: 1px;
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
@@ -56,7 +56,7 @@
             margin: 10px auto 0;
             border-radius: 2px;
         }
-        
+
         table {
             table-layout: fixed;
             width: 100%;
@@ -67,11 +67,14 @@
             overflow: hidden;
             box-shadow: 0 5px 20px rgba(0,0,0,0.07);
             background: white;
+            transform: scale(0.65);
+            transform-origin: top center;
+            margin-bottom: -15%;
         }
 
         th, td {
             border: none;
-            padding: 4px !important;
+            padding: 2px !important;
             text-align: center;
             position: relative;
         }
@@ -90,16 +93,18 @@
             background: linear-gradient(to bottom, #283593, #1a237e);
             color: white;
             font-weight: 600;
+            font-size: 0.8em;
+            padding: 2px !important;
         }
 
         td:not(.time-col) {
             border-right: 1px solid rgba(0,0,0,0.05);
             border-bottom: 1px solid rgba(0,0,0,0.05);
-            padding: 8px !important; /* パディングを増やす */
+            padding: 4px !important;
         }
 
         .subject {
-            min-height: 90px;
+            min-height: 40px;
             cursor: pointer;
             border-radius: 8px;
             margin: 4px;
@@ -113,10 +118,9 @@
             background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(240,240,240,0.7) 100%);
             width: calc(100% - 8px);
             box-sizing: border-box;
-            overflow: hidden; /* テキストが溢れないように */
-            word-wrap: break-word; /* 長い単語を折り返す */
+            overflow: hidden;
+            word-wrap: break-word;
         }
-
 
         .subject:hover {
             transform: translateY(-2px) scale(1.02);
@@ -151,30 +155,30 @@
         }
 
         .subject-name {
-            font-size: 1.2em;
+            font-size: 1em;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             text-align: center;
             word-wrap: break-word;
             overflow-wrap: break-word;
             max-width: 100%;
             color: #2c3e50;
-            width: 100%; /* 幅を100%に設定 */
+            width: 100%;
         }
 
         .subject-room {
-            font-size: 0.8em;
+            font-size: 0.7em;
             color: #444;
             background-color: rgba(255,255,255,0.7);
-            padding: 3px 8px;
+            padding: 2px 6px;
             border-radius: 12px;
             border: 1px solid rgba(0,0,0,0.05);
             font-family: 'Courier New', monospace;
             letter-spacing: 0.5px;
-            margin: 2px auto; /* 中央揃えのためのマージン */
-            display: inline-block; /* インラインブロック要素として表示 */
-            max-width: 90%; /* 最大幅を制限 */
-            word-break: break-all; /* 必要に応じて単語を分割 */
+            margin: 2px auto;
+            display: inline-block;
+            max-width: 90%;
+            word-break: break-all;
         }
 
         /* 凡例 */
@@ -182,8 +186,8 @@
             display: flex;
             justify-content: center;
             gap: 20px;
-            margin: 15px 0 25px;
-            padding: 12px;
+            margin: 5px 0 8px;
+            padding: 5px;
             background: linear-gradient(to right, rgba(255,255,255,0.9), rgba(245,245,245,0.9));
             border-radius: 10px;
             box-shadow: 0 3px 10px rgba(0,0,0,0.05);
@@ -225,19 +229,19 @@
             background: linear-gradient(135deg, rgba(186, 104, 200, 0.7) 0%, rgba(196, 114, 210, 0.5) 100%);
             border-left: 3px solid #8e24aa;
         }
-        
+
         /* タブ */
         .tabs {
             display: flex;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 5px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border-radius: 8px;
             overflow: hidden;
         }
 
         .tab {
-            padding: 12px 25px;
+            padding: 8px 20px;
             cursor: pointer;
             background-color: transparent;
             border: none;
@@ -259,25 +263,25 @@
         .tab:hover:not(.active) {
             background-color: rgba(63, 81, 181, 0.1);
         }
-        
+
         .tab:first-child {
             border-top-left-radius: 5px;
             border-bottom-left-radius: 5px;
         }
-        
+
         .tab:last-child {
             border-top-right-radius: 5px;
             border-bottom-right-radius: 5px;
         }
-        
+
         .quarter-content {
             display: none;
         }
-        
+
         .quarter-content.active {
             display: block;
         }
-        
+
         /* オプションメニュー */
         .options {
             position: absolute;
@@ -288,7 +292,7 @@
             z-index: 10;
             padding: 5px;
         }
-        
+
         .options button {
             display: block;
             width: 100%;
@@ -298,11 +302,11 @@
             padding: 5px 10px;
             cursor: pointer;
         }
-        
+
         .options button:hover {
             background-color: #f5f5f5;
         }
-        
+
         /* フォーム */
         #subjectForm {
             position: fixed;
@@ -523,7 +527,7 @@
             z-index: 99;
             backdrop-filter: blur(2px);
         }
-        
+
         .hidden {
             display: none;
         }
@@ -725,6 +729,8 @@
             table {
                 table-layout: fixed;
                 font-size: 0.9em;
+                transform: scale(0.6);
+                margin-bottom: -20%;
             }
             
             th, td {
@@ -740,7 +746,7 @@
             }
             
             .subject {
-                min-height: 70px;
+                min-height: 35px;
                 margin: 2px;
                 padding: 4px;
             }
@@ -789,6 +795,8 @@
             
             table {
                 min-width: 450px; /* 最小幅を設定 */
+                transform: scale(0.5);
+                margin-bottom: -25%;
             }
             
             .time-col {
@@ -796,7 +804,7 @@
             }
             
             .subject {
-                min-height: 60px;
+                min-height: 30px;
             }
             
             .subject-name {
@@ -807,7 +815,7 @@
         /* 横向きモバイルデバイス用 */
         @media screen and (min-width: 481px) and (max-width: 768px) {
             .subject {
-                min-height: 80px;
+                min-height: 50px;
             }
         }
 
@@ -818,10 +826,44 @@
             }
             
             .subject {
-                min-height: 85px;
+                min-height: 55px;
+            }
+            
+            table {
+                transform: scale(0.85);
+                margin-bottom: -8%;
             }
         }
 
+        /* 画面高さが低い場合の調整 */
+        @media screen and (max-height: 650px) {
+            table {
+                transform: scale(0.7);
+                margin-bottom: -15%;
+            }
+            
+            .subject {
+                min-height: 45px;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+                margin-bottom: 8px;
+            }
+            
+            .legend {
+                margin: 5px 0 8px;
+                padding: 5px;
+            }
+            
+            .tabs {
+                margin-bottom: 5px;
+            }
+            
+            .tab {
+                padding: 6px 15px;
+            }
+        }
     </style>
 </head>
 <body>
