@@ -1,0 +1,2268 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大学4年生 時間割表</title>
+    <style>
+        body {
+            font-family: 'Roboto', 'Segoe UI', 'Helvetica', 'Arial', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 30px;
+            background-color: #f0f3f8;
+            line-height: 1.6;
+            background-image: linear-gradient(to bottom right, rgba(240,243,248,1) 0%, rgba(220,230,245,1) 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #1a237e;
+            margin-bottom: 25px;
+            font-size: 2.3em;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        h1:after {
+            content: "";
+            display: block;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, #1a237e, #0d47a1);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+        
+        table {
+            table-layout: fixed;
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.07);
+            background: white;
+        }
+
+        th, td {
+            border: none;
+            padding: 4px !important;
+            text-align: center;
+            position: relative;
+        }
+
+        th {
+            background: linear-gradient(to bottom, #3949ab, #303f9f);
+            color: white;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+        }
+
+        .time-col {
+            width: 8%;
+            background: linear-gradient(to bottom, #283593, #1a237e);
+            color: white;
+            font-weight: 600;
+        }
+
+        td:not(.time-col) {
+            border-right: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 8px !important; /* パディングを増やす */
+        }
+
+        .subject {
+            min-height: 90px;
+            cursor: pointer;
+            border-radius: 8px;
+            margin: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(240,240,240,0.7) 100%);
+            width: calc(100% - 8px);
+            box-sizing: border-box;
+            overflow: hidden; /* テキストが溢れないように */
+            word-wrap: break-word; /* 長い単語を折り返す */
+        }
+
+
+        .subject:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .empty {
+            background: linear-gradient(135deg, #f5f5f5 0%, #fafafa 100%);
+            color: #aaa;
+            font-size: 0.85em;
+            border: 1px dashed rgba(0,0,0,0.1);
+        }
+
+        .required {
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.7) 0%, rgba(255, 192, 203, 0.5) 100%);
+            border-left: 3px solid #e84393;
+        }
+
+        .elective {
+            background: linear-gradient(135deg, rgba(173, 216, 230, 0.7) 0%, rgba(183, 226, 240, 0.5) 100%);
+            border-left: 3px solid #0984e3;
+        }
+
+        .other {
+            background: linear-gradient(135deg, rgba(144, 238, 144, 0.7) 0%, rgba(154, 248, 154, 0.5) 100%);
+            border-left: 3px solid #00b894;
+        }
+
+        .masters {
+            background: linear-gradient(135deg, rgba(186, 104, 200, 0.7) 0%, rgba(196, 114, 210, 0.5) 100%);
+            border-left: 3px solid #8e24aa;
+        }
+
+        .subject-name {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-align: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+            color: #2c3e50;
+            width: 100%; /* 幅を100%に設定 */
+        }
+
+        .subject-room {
+            font-size: 0.8em;
+            color: #444;
+            background-color: rgba(255,255,255,0.7);
+            padding: 3px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.05);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5px;
+            margin: 2px auto; /* 中央揃えのためのマージン */
+            display: inline-block; /* インラインブロック要素として表示 */
+            max-width: 90%; /* 最大幅を制限 */
+            word-break: break-all; /* 必要に応じて単語を分割 */
+        }
+
+        /* 凡例 */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0 25px;
+            padding: 12px;
+            background: linear-gradient(to right, rgba(255,255,255,0.9), rgba(245,245,245,0.9));
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background-color: rgba(255,255,255,0.7);
+        }
+
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        .legend-color.required {
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.7) 0%, rgba(255, 192, 203, 0.5) 100%);
+            border-left: 3px solid #e84393;
+        }
+
+        .legend-color.elective {
+            background: linear-gradient(135deg, rgba(173, 216, 230, 0.7) 0%, rgba(183, 226, 240, 0.5) 100%);
+            border-left: 3px solid #0984e3;
+        }
+
+        .legend-color.other {
+            background: linear-gradient(135deg, rgba(144, 238, 144, 0.7) 0%, rgba(154, 248, 154, 0.5) 100%);
+            border-left: 3px solid #00b894;
+        }
+
+        .legend-color.masters {
+            background: linear-gradient(135deg, rgba(186, 104, 200, 0.7) 0%, rgba(196, 114, 210, 0.5) 100%);
+            border-left: 3px solid #8e24aa;
+        }
+        
+        /* タブ */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            background-color: transparent;
+            border: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #5c6bc0;
+            position: relative;
+            z-index: 1;
+            border-radius: 8px;
+            margin: 0 2px;
+        }
+
+        .tab.active {
+            background-color: #3f51b5;
+            color: white;
+            box-shadow: 0 3px 8px rgba(63, 81, 181, 0.3);
+        }
+
+        .tab:hover:not(.active) {
+            background-color: rgba(63, 81, 181, 0.1);
+        }
+        
+        .tab:first-child {
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .tab:last-child {
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .quarter-content {
+            display: none;
+        }
+        
+        .quarter-content.active {
+            display: block;
+        }
+        
+        /* オプションメニュー */
+        .options {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+            padding: 5px;
+        }
+        
+        .options button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        
+        .options button:hover {
+            background-color: #f5f5f5;
+        }
+        
+        /* フォーム */
+        #subjectForm {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(248,250,252,0.97));
+            padding: 28px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 100;
+            width: 400px;
+            max-width: 95vw;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #3f51b5;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 15px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background-color: rgba(255,255,255,0.8);
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #3f51b5;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
+            background-color: white;
+        }
+
+        /* 科目選択リスト */
+        .subject-select {
+            margin-bottom: 15px;
+        }
+
+        .subject-select-label {
+            font-weight: 600;
+            color: #3f51b5;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .subject-select-container {
+            position: relative;
+        }
+
+        .subject-select-dropdown {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .subject-select-dropdown:hover, .subject-select-dropdown.active {
+            border-color: #3f51b5;
+            box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.1);
+        }
+
+        .subject-select-dropdown-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: all 0.3s ease;
+        }
+
+        .subject-select-dropdown.active .subject-select-dropdown-icon {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .subject-select-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: white;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 0 0 8px 8px;
+            z-index: 10;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .subject-select-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .subject-select-option:hover {
+            background-color: rgba(63, 81, 181, 0.1);
+        }
+
+        .subject-select-option-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .subject-select-option-type {
+            font-size: 0.8em;
+            padding: 2px 8px;
+            border-radius: 12px;
+            color: white;
+            background-color: #3f51b5;
+        }
+
+        .subject-select-option-type.required {
+            background-color: #e84393;
+        }
+
+        .subject-select-option-type.elective {
+            background-color: #0984e3;
+        }
+
+        .subject-select-option-type.other {
+            background-color: #00b894;
+        }
+
+        .subject-select-option-type.masters {
+            background-color: #8e24aa;
+        }
+
+        .form-divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .form-divider::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .form-divider span {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(248,250,252,0.97));
+            padding: 0 15px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .form-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-save {
+            background: linear-gradient(to right, #43a047, #2e7d32);
+            color: white;
+            box-shadow: 0 3px 10px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn-save:hover {
+            background: linear-gradient(to right, #388e3c, #1b5e20);
+            transform: translateY(-2px);
+        }
+
+        .btn-cancel {
+            background: linear-gradient(to right, #e53935, #c62828);
+            color: white;
+            box-shadow: 0 3px 10px rgba(198, 40, 40, 0.3);
+        }
+
+        .btn-cancel:hover {
+            background: linear-gradient(to right, #d32f2f, #b71c1c);
+            transform: translateY(-2px);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(10, 20, 40, 0.5);
+            z-index: 99;
+            backdrop-filter: blur(2px);
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        /* 通知 */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #3f51b5, #5c6bc0);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            accent-color: #3f51b5;
+        }
+
+        .checkbox-group label {
+            display: inline;
+            font-weight: normal;
+            color: #444;
+        }
+
+        .or-divider {
+            text-align: center;
+            margin: 10px 0;
+            color: #666;
+            position: relative;
+        }
+
+        .or-divider::before, .or-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .or-divider::before {
+            left: 0;
+        }
+
+        .or-divider::after {
+            right: 0;
+        }
+        /* 時限範囲セレクター用スタイル */
+        .time-range-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .time-range-controls select {
+            flex: 1;
+        }
+
+        /* 複数時限関連のスタイル */
+        .multi-period {
+            position: relative;
+            z-index: 5;
+        }
+
+        .continuation-cell {
+            display: none !important;
+        }
+
+        td.continuation-cell {
+            padding: 0 !important;
+            height: 0 !important;
+        }
+
+        .subject-display {
+            min-height: 100%;
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .subject-display:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .subject-period-range {
+            font-size: 0.8em;
+            color: #555;
+            background: rgba(255,255,255,0.7);
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+
+        /* 複数時限セルのスタイル改善 */
+        .multi-period-parent {
+            position: relative !important;
+            z-index: 5 !important;
+            overflow: visible !important;
+        }
+
+        .continuation-cell {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        .multi-cell-container {
+            position: absolute;
+            z-index: 5;
+            box-sizing: border-box;
+            padding: 0; /* パディングを削除 */
+            width: 100% !important; /* 幅を100%に */
+            left: 0 !important;
+        }
+
+        .subject-block {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            max-width: 100%; /* 追加: 最大幅を制限 */
+            margin: 0 auto; /* 追加: 中央揃え */
+        }
+
+
+        .subject-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .period-label {
+            font-size: 0.8em;
+            background: rgba(255,255,255,0.7);
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-top: 5px;
+            margin: 4px auto; /* 中央揃えのためのマージン */
+            display: inline-block; /* インラインブロック要素として表示 */
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>大学4年生 時間割表</h1>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color required"></div>
+                <span>必修</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color elective"></div>
+                <span>選択</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color other"></div>
+                <span>系外科目</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color masters"></div>
+                <span>修士</span>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-quarter="1">1Q</div>
+            <div class="tab" data-quarter="2">2Q</div>
+            <div class="tab" data-quarter="3">3Q</div>
+            <div class="tab" data-quarter="4">4Q</div>
+        </div>
+        
+        <div class="quarter-content active" id="quarter1">
+            <table>
+                <tr>
+                    <th class="time-col">時限</th>
+                    <th>月</th>
+                    <th>火</th>
+                    <th>水</th>
+                    <th>木</th>
+                    <th>金</th>
+                </tr>
+                <tr>
+                    <td class="time-col">1<br>(8:50-9:40)</td>
+                    <td><div class="subject empty" data-quarter="1" data-day="mon" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="tue" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="wed" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="thu" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="fri" data-time="1">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">2<br>(9:40-10:30)</td>
+                    <td><div class="subject empty" data-quarter="1" data-day="mon" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="tue" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="wed" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="thu" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="fri" data-time="2">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">3<br>(10:45-11:35)</td>
+                    <td><div class="subject empty" data-quarter="1" data-day="mon" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="tue" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="wed" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="thu" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="fri" data-time="3">クリックして科目を追加</div></td>
+                </tr>
+                <!-- 4〜10限も同様に追加 -->
+                <tr>
+                    <td class="time-col">4<br>(11:35-12:25)</td>
+                    <td><div class="subject empty" data-quarter="1" data-day="mon" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="tue" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="wed" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="thu" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="fri" data-time="4">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">5<br>(13:30-14:20)</td>
+                    <td><div class="subject empty" data-quarter="1" data-day="mon" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="tue" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="wed" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="thu" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="fri" data-time="5">クリックして科目を追加</div></td>
+                </tr>
+                <!-- 残りの時限を同様に追加 -->
+                <tr>
+                    <td class="time-col">6<br>(14:20-15:10)</td>
+                    <td><div class="subject empty" data-quarter="1" data-day="mon" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="tue" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="wed" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="thu" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="fri" data-time="6">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">7<br>(15:25-16:15)</td>
+                    <td><div class="subject empty" data-quarter="1" data-day="mon" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="tue" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="wed" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="thu" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="fri" data-time="7">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">8<br>(16:15-17:05)</td>
+                    <td><div class="subject empty" data-quarter="1" data-day="mon" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="tue" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="wed" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="thu" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="fri" data-time="8">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">9<br>(17:20-18:10)</td>
+                    <td><div class="subject empty" data-quarter="1" data-day="mon" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="tue" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="wed" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="thu" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="fri" data-time="9">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">10<br>(18:10-19:00)</td>
+                    <td><div class="subject empty" data-quarter="1" data-day="mon" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="tue" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="wed" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="thu" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="1" data-day="fri" data-time="10">クリックして科目を追加</div></td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="quarter-content" id="quarter2">
+            <table>
+                <tr>
+                    <th class="time-col">時限</th>
+                    <th>月</th>
+                    <th>火</th>
+                    <th>水</th>
+                    <th>木</th>
+                    <th>金</th>
+                </tr>
+                <tr>
+                    <td class="time-col">1<br>(8:50-9:40)</td>
+                    <td><div class="subject empty" data-quarter="2" data-day="mon" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="tue" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="wed" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="thu" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="fri" data-time="1">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">2<br>(9:40-10:30)</td>
+                    <td><div class="subject empty" data-quarter="2" data-day="mon" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="tue" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="wed" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="thu" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="fri" data-time="2">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">3<br>(10:45-11:35)</td>
+                    <td><div class="subject empty" data-quarter="2" data-day="mon" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="tue" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="wed" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="thu" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="fri" data-time="3">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">4<br>(11:35-12:25)</td>
+                    <td><div class="subject empty" data-quarter="2" data-day="mon" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="tue" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="wed" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="thu" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="fri" data-time="4">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">5<br>(13:30-14:20)</td>
+                    <td><div class="subject empty" data-quarter="2" data-day="mon" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="tue" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="wed" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="thu" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="fri" data-time="5">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">6<br>(14:20-15:10)</td>
+                    <td><div class="subject empty" data-quarter="2" data-day="mon" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="tue" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="wed" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="thu" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="fri" data-time="6">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">7<br>(15:25-16:15)</td>
+                    <td><div class="subject empty" data-quarter="2" data-day="mon" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="tue" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="wed" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="thu" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="fri" data-time="7">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">8<br>(16:15-17:05)</td>
+                    <td><div class="subject empty" data-quarter="2" data-day="mon" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="tue" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="wed" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="thu" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="fri" data-time="8">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">9<br>(17:20-18:10)</td>
+                    <td><div class="subject empty" data-quarter="2" data-day="mon" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="tue" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="wed" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="thu" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="fri" data-time="9">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">10<br>(18:10-19:00)</td>
+                    <td><div class="subject empty" data-quarter="2" data-day="mon" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="tue" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="wed" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="thu" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="2" data-day="fri" data-time="10">クリックして科目を追加</div></td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="quarter-content" id="quarter3">
+            <table>
+                <tr>
+                    <th class="time-col">時限</th>
+                    <th>月</th>
+                    <th>火</th>
+                    <th>水</th>
+                    <th>木</th>
+                    <th>金</th>
+                </tr>
+                <tr>
+                    <td class="time-col">1<br>(8:50-9:40)</td>
+                    <td><div class="subject empty" data-quarter="3" data-day="mon" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="tue" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="wed" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="thu" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="fri" data-time="1">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">2<br>(9:40-10:30)</td>
+                    <td><div class="subject empty" data-quarter="3" data-day="mon" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="tue" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="wed" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="thu" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="fri" data-time="2">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">3<br>(10:45-11:35)</td>
+                    <td><div class="subject empty" data-quarter="3" data-day="mon" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="tue" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="wed" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="thu" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="fri" data-time="3">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">4<br>(11:35-12:25)</td>
+                    <td><div class="subject empty" data-quarter="3" data-day="mon" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="tue" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="wed" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="thu" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="fri" data-time="4">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">5<br>(13:30-14:20)</td>
+                    <td><div class="subject empty" data-quarter="3" data-day="mon" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="tue" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="wed" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="thu" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="fri" data-time="5">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">6<br>(14:20-15:10)</td>
+                    <td><div class="subject empty" data-quarter="3" data-day="mon" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="tue" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="wed" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="thu" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="fri" data-time="6">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">7<br>(15:25-16:15)</td>
+                    <td><div class="subject empty" data-quarter="3" data-day="mon" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="tue" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="wed" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="thu" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="fri" data-time="7">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">8<br>(16:15-17:05)</td>
+                    <td><div class="subject empty" data-quarter="3" data-day="mon" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="tue" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="wed" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="thu" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="fri" data-time="8">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">9<br>(17:20-18:10)</td>
+                    <td><div class="subject empty" data-quarter="3" data-day="mon" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="tue" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="wed" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="thu" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="fri" data-time="9">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">10<br>(18:10-19:00)</td>
+                    <td><div class="subject empty" data-quarter="3" data-day="mon" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="tue" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="wed" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="thu" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="3" data-day="fri" data-time="10">クリックして科目を追加</div></td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="quarter-content" id="quarter4">
+            <table>
+                <tr>
+                    <th class="time-col">時限</th>
+                    <th>月</th>
+                    <th>火</th>
+                    <th>水</th>
+                    <th>木</th>
+                    <th>金</th>
+                </tr>
+                <tr>
+                    <td class="time-col">1<br>(8:50-9:40)</td>
+                    <td><div class="subject empty" data-quarter="4" data-day="mon" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="tue" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="wed" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="thu" data-time="1">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="fri" data-time="1">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">2<br>(9:40-10:30)</td>
+                    <td><div class="subject empty" data-quarter="4" data-day="mon" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="tue" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="wed" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="thu" data-time="2">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="fri" data-time="2">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">3<br>(10:45-11:35)</td>
+                    <td><div class="subject empty" data-quarter="4" data-day="mon" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="tue" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="wed" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="thu" data-time="3">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="fri" data-time="3">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">4<br>(11:35-12:25)</td>
+                    <td><div class="subject empty" data-quarter="4" data-day="mon" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="tue" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="wed" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="thu" data-time="4">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="fri" data-time="4">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">5<br>(13:30-14:20)</td>
+                    <td><div class="subject empty" data-quarter="4" data-day="mon" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="tue" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="wed" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="thu" data-time="5">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="fri" data-time="5">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">6<br>(14:20-15:10)</td>
+                    <td><div class="subject empty" data-quarter="4" data-day="mon" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="tue" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="wed" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="thu" data-time="6">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="fri" data-time="6">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">7<br>(15:25-16:15)</td>
+                    <td><div class="subject empty" data-quarter="4" data-day="mon" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="tue" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="wed" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="thu" data-time="7">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="fri" data-time="7">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">8<br>(16:15-17:05)</td>
+                    <td><div class="subject empty" data-quarter="4" data-day="mon" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="tue" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="wed" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="thu" data-time="8">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="fri" data-time="8">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">9<br>(17:20-18:10)</td>
+                    <td><div class="subject empty" data-quarter="4" data-day="mon" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="tue" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="wed" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="thu" data-time="9">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="fri" data-time="9">クリックして科目を追加</div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">10<br>(18:10-19:00)</td>
+                    <td><div class="subject empty" data-quarter="4" data-day="mon" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="tue" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="wed" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="thu" data-time="10">クリックして科目を追加</div></td>
+                    <td><div class="subject empty" data-quarter="4" data-day="fri" data-time="10">クリックして科目を追加</div></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <!-- 科目入力フォーム -->
+    <div id="subjectForm" class="hidden">
+        <!-- 登録済み科目選択セクション -->
+        <div id="savedSubjectsSection">
+            <div class="form-group">
+                <label for="savedSubjects">登録済み科目から選択</label>
+                <select id="savedSubjects">
+                    <option value="">-- 科目を選択 --</option>
+                    <!-- JavaScriptで動的に追加されるオプション -->
+                </select>
+            </div>
+            
+            <div class="or-divider">または</div>
+        </div>
+        
+        <!-- 新規科目入力セクション -->
+        <div class="form-group">
+            <label for="subjectName">科目名</label>
+            <input type="text" id="subjectName" placeholder="科目名を入力">
+        </div>
+        <div class="form-group">
+            <label for="subjectRoom">教室</label>
+            <input type="text" id="subjectRoom" placeholder="教室名を入力">
+        </div>
+        <div class="form-group">
+            <label for="subjectType">科目タイプ</label>
+            <select id="subjectType">
+                <option value="required">必修</option>
+                <option value="elective">選択</option>
+                <option value="other">系外科目</option>
+                <option value="masters">修士</option>
+            </select>
+        </div>
+        <div class="form-group checkbox-group">
+            <input type="checkbox" id="bulkUpdate">
+            <label for="bulkUpdate">同じ名前の講義を一括変更する</label>
+        </div>
+        <div class="form-group time-range">
+            <label for="startTime">時限範囲</label>
+            <div class="time-range-controls">
+                <select id="startTime">
+                    <option value="1">1限</option>
+                    <option value="2">2限</option>
+                    <option value="3">3限</option>
+                    <option value="4">4限</option>
+                    <option value="5">5限</option>
+                    <option value="6">6限</option>
+                    <option value="7">7限</option>
+                    <option value="8">8限</option>
+                    <option value="9">9限</option>
+                    <option value="10">10限</option>
+                </select>
+                <span>～</span>
+                <select id="endTime">
+                    <option value="1">1限</option>
+                    <option value="2">2限</option>
+                    <option value="3">3限</option>
+                    <option value="4">4限</option>
+                    <option value="5">5限</option>
+                    <option value="6">6限</option>
+                    <option value="7">7限</option>
+                    <option value="8">8限</option>
+                    <option value="9">9限</option>
+                    <option value="10">10限</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button class="btn-cancel" id="cancelSubject">キャンセル</button>
+            <button class="btn-save" id="saveSubject">保存</button>
+        </div>
+    </div>
+    
+    <div id="overlay" class="hidden"></div>
+    
+    <script>
+        // 即時実行関数でスコープをカプセル化
+        (function() {
+            // グローバル変数
+            let currentCell = null;
+            let currentOptions = null;
+            let subjectCatalog = {}; // 科目カタログ（科目名をキーとする辞書）
+            let scheduleMap = {}; // クォーター・曜日・時限ごとの科目データを一元管理
+
+            // 時間割データ構造を初期化
+            function initScheduleMap() {
+                scheduleMap = {};
+                const quarters = [1, 2, 3, 4];
+                const days = ['mon', 'tue', 'wed', 'thu', 'fri'];
+                const periods = Array.from({length: 10}, (_, i) => i + 1);
+                
+                quarters.forEach(quarter => {
+                    scheduleMap[quarter] = {};
+                    days.forEach(day => {
+                        scheduleMap[quarter][day] = {};
+                        periods.forEach(period => {
+                            scheduleMap[quarter][day][period] = null; // 最初はすべての時限が空
+                        });
+                    });
+                });
+            }
+
+            // 時限範囲の取得（例: 1→1-2, 3→3-4)
+            function getPeriodRange(period) {
+                if (period % 2 === 1) {
+                    return `${period}-${period + 1}`;
+                }
+                return `${period - 1}-${period}`;
+            }
+
+            // 時限の数値を取得
+            function getPeriodNumber(periodRange) {
+                return parseInt(periodRange.split('-')[0]);
+            }
+
+            // 時限範囲内のセルをすべて取得
+            function getTimeSlotsInRange(quarter, day, startPeriod, endPeriod) {
+                const cells = [];
+                startPeriod = parseInt(startPeriod);
+                endPeriod = parseInt(endPeriod);
+                
+                // 指定範囲内の各時限に対応するセルを取得
+                for (let period = startPeriod; period <= endPeriod; period++) {
+                    const selector = `.subject[data-quarter="${quarter}"][data-day="${day}"][data-time="${period}"]`;
+                    const cell = document.querySelector(selector);
+                    if (cell) {
+                        cells.push(cell);
+                    }
+                }
+                
+                return cells;
+            }
+
+            // scheduleMapにデータを保存する関数
+            function saveSubjectToSchedule(quarter, day, startPeriod, endPeriod, name, room, type) {
+                // 複数時限かどうかを判定
+                const isMultiPeriod = startPeriod !== endPeriod;
+                
+                // 指定範囲の全時限にデータを設定
+                for (let period = startPeriod; period <= endPeriod; period++) {
+                    scheduleMap[quarter][day][period] = {
+                        name,
+                        room,
+                        type,
+                        isMultiPeriod,
+                        startPeriod,
+                        endPeriod
+                    };
+                }
+            }
+
+            // scheduleMapから指定範囲のデータを削除する関数
+            function clearSubjectFromSchedule(quarter, day, startPeriod, endPeriod) {
+                for (let period = startPeriod; period <= endPeriod; period++) {
+                    scheduleMap[quarter][day][period] = null;
+                }
+            }
+
+            function resetCellToEmpty(cell) {
+                if (!cell) return;
+                
+                const td = cell.closest('td');
+                if (td) {
+                    // すべてのマルチセルコンテナを削除
+                    const containers = td.querySelectorAll('.multi-cell-container');
+                    containers.forEach(container => container.remove());
+                    
+                    // TDのスタイルをリセット
+                    td.style = '';
+                    td.style.padding = '8px'; // パディングを増やす
+                }
+                
+                // セルを初期状態に戻す
+                cell.innerHTML = 'クリックして科目を追加';
+                cell.className = 'subject empty';
+                cell.removeAttribute('style'); // 既存のスタイルを削除
+                
+                // 明示的に空セル用のスタイルを適用
+                cell.style.width = 'calc(100% - 8px)';
+                cell.style.margin = '4px';
+                cell.style.minHeight = '90px';
+                cell.style.border = '1px dashed rgba(0,0,0,0.1)';
+                cell.style.background = 'linear-gradient(135deg, #f5f5f5 0%, #fafafa 100%)';
+                cell.style.color = '#aaa';
+                cell.style.fontSize = '0.85em';
+                cell.style.display = 'flex';
+                cell.style.justifyContent = 'center';
+                cell.style.alignItems = 'center';
+                cell.style.textAlign = 'center';
+                cell.style.wordWrap = 'break-word';
+                
+                // 参照をクリア
+                if ('multiCellContainer' in cell) {
+                    delete cell.multiCellContainer;
+                }
+            }
+
+            // 時間割をレンダリングする関数
+            function renderTimetable() {
+                // まず全てのセルをクリア
+                document.querySelectorAll('.subject').forEach(cell => {
+                    const td = cell.closest('td');
+                    // マルチセルコンテナを削除
+                    if (td) {
+                        const containers = td.querySelectorAll('.multi-cell-container');
+                        containers.forEach(container => container.remove());
+                        td.style = '';
+                        td.removeAttribute('style');
+                        td.style.padding = '4px'; // パディングを統一
+                    }
+                    
+                    // セルを初期状態に戻す
+                    resetCellToEmpty(cell);
+                });
+                
+                // scheduleMapからデータを読み取って表示
+                const quarters = [1, 2, 3, 4];
+                const days = ['mon', 'tue', 'wed', 'thu', 'fri'];
+                
+                quarters.forEach(quarter => {
+                    days.forEach(day => {
+                        // この四半期と曜日の複数時限セル情報を集める
+                        const multiPeriodSubjects = [];
+                        const processedPeriods = new Set();
+                        
+                        // 時限ごとのデータを確認
+                        for (let period = 1; period <= 10; period++) {
+                            // 既に処理済みの時限はスキップ
+                            if (processedPeriods.has(period)) continue;
+                            
+                            const subjectData = scheduleMap[quarter][day][period];
+                            if (!subjectData) continue;
+                            
+                            // 複数時限セルの場合
+                            if (subjectData.isMultiPeriod) {
+                                // この複数時限科目の全範囲を処理済みとしてマーク
+                                for (let p = subjectData.startPeriod; p <= subjectData.endPeriod; p++) {
+                                    processedPeriods.add(p);
+                                }
+                                
+                                // 複数時限科目リストに追加
+                                multiPeriodSubjects.push({
+                                    name: subjectData.name,
+                                    room: subjectData.room,
+                                    type: subjectData.type,
+                                    startPeriod: subjectData.startPeriod,
+                                    endPeriod: subjectData.endPeriod
+                                });
+                            } 
+                            // 単一時限セルの場合はそのまま表示
+                            else {
+                                processedPeriods.add(period);
+                                
+                                const selector = `.subject[data-quarter="${quarter}"][data-day="${day}"][data-time="${period}"]`;
+                                const cell = document.querySelector(selector);
+                                if (cell) {
+                                    updateSubjectCell(cell, subjectData.name, subjectData.room, subjectData.type);
+                                }
+                            }
+                        }
+                        
+                        // 複数時限科目を描画
+                        multiPeriodSubjects.forEach(subject => {
+                            const cells = getTimeSlotsInRange(quarter, day, subject.startPeriod, subject.endPeriod);
+                            if (cells.length > 0) {
+                                createMultiPeriodCell(cells, subject.name, subject.room, subject.type, subject.startPeriod, subject.endPeriod);
+                            }
+                        });
+                    });
+                });
+            }
+
+            // 複数時限セルの作成（完全に書き直し）
+            function createMultiPeriodCell(cells, name, room, type, startPeriod, endPeriod) {
+                if (cells.length === 0) return;
+                
+                // すべてのセルをクリア
+                cells.forEach(cell => {
+                    cell.innerHTML = '';
+                    cell.className = 'subject';
+                    cell.style = '';
+                    cell.removeAttribute('style');
+                });
+                
+                // 親セル（最初のセル）
+                const parentCell = cells[0];
+                const parentTd = parentCell.closest('td');
+                
+                // 各セルの行要素を取得
+                const rows = cells.map(cell => cell.closest('tr'));
+                
+                // 最初の行のtop位置
+                const firstRowTop = rows[0].offsetTop;
+                
+                // 最後の行のbottom位置
+                const lastRow = rows[rows.length - 1];
+                const lastRowBottom = lastRow.offsetTop + lastRow.offsetHeight;
+                
+                // 全体の高さを計算
+                const totalHeight = lastRowBottom - firstRowTop;
+                
+                // 全てのセルが含まれるTDをposition:relativeに設定
+                parentTd.style.position = 'relative';
+                parentTd.style.padding = '4px';
+                
+                // 親セルをemptyにしておく（背景色が重複しないよう）
+                parentCell.classList.add('empty');
+                parentCell.style.background = 'transparent';
+                parentCell.style.border = 'none';
+                parentCell.style.boxShadow = 'none';
+                
+                // マルチセル用の包括コンテナを作成
+                const container = document.createElement('div');
+                container.className = 'multi-cell-container';
+                container.style.position = 'absolute';
+                container.style.top = '0';
+                container.style.left = '0';
+                container.style.width = '100%';
+                container.style.height = `${totalHeight}px`;
+                container.style.zIndex = '5';
+                container.style.padding = '8px'; // パディングを増やす
+                container.style.boxSizing = 'border-box';
+                container.setAttribute('data-period-range', `${startPeriod}-${endPeriod}`);
+                parentTd.appendChild(container);
+
+                // 科目ブロック要素
+                const subjectBlock = document.createElement('div');
+                subjectBlock.className = `subject-block ${type}`;
+                subjectBlock.style.width = 'calc(100% - 8px)';
+                subjectBlock.style.height = 'calc(100% - 8px)';
+                subjectBlock.style.margin = '4px';
+                subjectBlock.style.display = 'flex';
+                subjectBlock.style.flexDirection = 'column'; // 縦方向に配置
+                subjectBlock.style.justifyContent = 'center';
+                subjectBlock.style.alignItems = 'center'; // 中央揃え
+                subjectBlock.style.borderRadius = '8px';
+                subjectBlock.style.padding = '8px';
+                subjectBlock.style.boxShadow = '0 2px 15px rgba(0,0,0,0.05)';
+                
+                // 科目タイプに応じた背景スタイル
+                if (type === 'required') {
+                    subjectBlock.style.background = 'linear-gradient(135deg, rgba(255, 182, 193, 0.7) 0%, rgba(255, 192, 203, 0.5) 100%)';
+                    subjectBlock.style.borderLeft = '3px solid #e84393';
+                } else if (type === 'elective') {
+                    subjectBlock.style.background = 'linear-gradient(135deg, rgba(173, 216, 230, 0.7) 0%, rgba(183, 226, 240, 0.5) 100%)';
+                    subjectBlock.style.borderLeft = '3px solid #0984e3';
+                } else if (type === 'other') {
+                    subjectBlock.style.background = 'linear-gradient(135deg, rgba(144, 238, 144, 0.7) 0%, rgba(154, 248, 154, 0.5) 100%)';
+                    subjectBlock.style.borderLeft = '3px solid #00b894';
+                } else if (type === 'masters') {
+                    subjectBlock.style.background = 'linear-gradient(135deg, rgba(186, 104, 200, 0.7) 0%, rgba(196, 114, 210, 0.5) 100%)';
+                    subjectBlock.style.borderLeft = '3px solid #8e24aa';
+                }
+                
+                // 科目名要素
+                const nameElement = document.createElement('div');
+                nameElement.className = 'subject-name';
+                nameElement.textContent = name;
+                nameElement.style.width = '100%';
+                nameElement.style.textAlign = 'center';
+                nameElement.style.marginBottom = '6px';
+                nameElement.style.wordWrap = 'break-word';
+                subjectBlock.appendChild(nameElement);
+
+                // 教室要素（存在する場合）
+                if (room) {
+                    const roomElement = document.createElement('div');
+                    roomElement.className = 'subject-room';
+                    roomElement.textContent = room;
+                    roomElement.style.display = 'block'; // ブロック要素として表示
+                    roomElement.style.margin = '3px auto'; // 上下のマージンを追加
+                    roomElement.style.textAlign = 'center';
+                    roomElement.style.backgroundColor = 'rgba(255,255,255,0.7)';
+                    roomElement.style.padding = '3px 8px';
+                    roomElement.style.borderRadius = '12px';
+                    roomElement.style.border = '1px solid rgba(0,0,0,0.05)';
+                    roomElement.style.width = 'auto'; // 幅を内容に合わせる
+                    roomElement.style.maxWidth = '90%'; // 最大幅を制限
+                    subjectBlock.appendChild(roomElement);
+                }
+
+                // 時限範囲表示
+                const periodLabel = document.createElement('div');
+                periodLabel.className = 'period-label';
+                periodLabel.textContent = `${startPeriod}〜${endPeriod}限`;
+                periodLabel.style.display = 'block'; // ブロック要素として表示
+                periodLabel.style.margin = '3px auto'; // 上下のマージンを追加
+                periodLabel.style.textAlign = 'center';
+                periodLabel.style.fontSize = '0.8em';
+                periodLabel.style.background = 'rgba(255,255,255,0.7)';
+                periodLabel.style.padding = '2px 6px';
+                periodLabel.style.borderRadius = '10px';
+                periodLabel.style.border = '1px solid rgba(0,0,0,0.05)';
+                periodLabel.style.width = 'auto'; // 幅を内容に合わせる
+                periodLabel.style.maxWidth = '90%'; // 最大幅を制限
+                subjectBlock.appendChild(periodLabel);
+                
+                // 要素を追加
+                container.appendChild(subjectBlock);
+                
+                // 最初のセル以外は非表示に
+                for (let i = 1; i < cells.length; i++) {
+                    const cell = cells[i];
+                    const cellTd = cell.closest('td');
+                    cellTd.style.border = 'none';
+                    cellTd.style.padding = '0';
+                    cell.style.display = 'none';
+                    cell.classList.add('continuation-cell');
+                }
+                
+                // クリックイベントを設定
+                container.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    currentCell = parentCell;
+                    showOptions(this);
+                });
+                
+                // 親セルにコンテナへの参照を保存
+                parentCell.multiCellContainer = container;
+            }
+            // DOM読み込み完了時に実行
+            document.addEventListener('DOMContentLoaded', function() {
+                // 初期化
+                init();
+            });
+
+            // セルのパディングを統一する
+            function normalizeTableCellPadding() {
+                const cells = document.querySelectorAll('td');
+                cells.forEach(cell => {
+                    cell.style.padding = '4px';
+                });
+            }
+            
+            // アプリ初期化
+            function init() {
+                console.log('時間割アプリを初期化しています...');
+                
+                // scheduleMapを初期化
+                initScheduleMap();
+
+                // セルのパディングを統一
+                normalizeTableCellPadding();
+                
+                // 科目カタログをロード
+                loadSubjectCatalog();
+                
+                // 保存済みデータをロード
+                loadAllTimetableData();
+                
+                // タブ切り替え設定
+                setupTabs();
+                
+                // 科目セルのイベント設定
+                setupSubjectCells();
+                
+                // フォームボタンのイベント設定
+                setupFormButtons();
+                
+                // 保存済み科目選択の設定
+                setupSavedSubjectsSelect();
+                
+                console.log('初期化完了');
+            }
+            
+            // タブ切り替え設定
+            function setupTabs() {
+                const tabs = document.querySelectorAll('.tab');
+                
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        // すべてのタブとコンテンツから active クラスを削除
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.quarter-content').forEach(c => c.classList.remove('active'));
+                        
+                        // クリックされたタブと対応するコンテンツに active クラスを追加
+                        this.classList.add('active');
+                        const quarter = this.getAttribute('data-quarter');
+                        const content = document.getElementById('quarter' + quarter);
+                        if (content) {
+                            content.classList.add('active');
+                        }
+                        
+                        // オプションメニューがあれば閉じる
+                        if (currentOptions) {
+                            currentOptions.remove();
+                            currentOptions = null;
+                        }
+                    });
+                });
+            }
+            
+            // 科目セルのイベント設定
+            function setupSubjectCells() {
+                const subjects = document.querySelectorAll('.subject');
+                
+                subjects.forEach(subject => {
+                    // クリックイベントリスナーを追加
+                    subject.addEventListener('click', function(event) {
+                        event.stopPropagation();
+                        
+                        // クリックされたセルを記録
+                        currentCell = this;
+                        
+                        // 空のセルなら直接フォームを開く、そうでなければオプションメニューを表示
+                        if (this.classList.contains('empty')) {
+                            openSubjectForm();
+                        } else {
+                            showOptions(this);
+                        }
+                    });
+                });
+            }
+            
+            // 保存済み科目選択の設定
+            function setupSavedSubjectsSelect() {
+                const select = document.getElementById('savedSubjects');
+                
+                // 選択変更イベント
+                select.addEventListener('change', function() {
+                    const selectedValue = this.value;
+                    
+                    if (selectedValue) {
+                        // 選択された科目をフォームに設定
+                        const subject = subjectCatalog[selectedValue];
+                        if (subject) {
+                            document.getElementById('subjectName').value = subject.name;
+                            document.getElementById('subjectRoom').value = subject.room || '';
+                            document.getElementById('subjectType').value = subject.type;
+                        }
+                    }
+                });
+            }
+            
+            // フォームボタンのイベント設定
+            function setupFormButtons() {
+                // 保存ボタン
+                const saveButton = document.getElementById('saveSubject');
+                if (saveButton) {
+                    saveButton.addEventListener('click', saveSubject);
+                }
+                
+                // キャンセルボタン
+                const cancelButton = document.getElementById('cancelSubject');
+                if (cancelButton) {
+                    cancelButton.addEventListener('click', closeSubjectForm);
+                }
+                
+                // オーバーレイクリックでフォームを閉じる
+                const overlay = document.getElementById('overlay');
+                if (overlay) {
+                    overlay.addEventListener('click', function(e) {
+                        if (e.target === this) {
+                            closeSubjectForm();
+                        }
+                    });
+                }
+            }
+            
+            // 保存済み科目リストを更新
+            function updateSavedSubjectsSelect() {
+                const select = document.getElementById('savedSubjects');
+                
+                // 既存のオプションをクリア（最初のオプションを除く）
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
+                
+                // 科目カタログから科目を追加
+                const sortedSubjects = Object.values(subjectCatalog).sort((a, b) => {
+                    return a.name.localeCompare(b.name, 'ja'); // 日本語順でソート
+                });
+                
+                sortedSubjects.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject.name;
+                    
+                    // 科目タイプに応じて表示を変える
+                    let typeLabel = '';
+                    switch (subject.type) {
+                        case 'required': typeLabel = '【必修】'; break;
+                        case 'elective': typeLabel = '【選択】'; break;
+                        case 'other': typeLabel = '【系外】'; break;
+                        case 'masters': typeLabel = '【修士】'; break;
+                    }
+                    
+                    option.textContent = `${typeLabel} ${subject.name} ${subject.room ? '(' + subject.room + ')' : ''}`;
+                    select.appendChild(option);
+                });
+            }
+            
+            // オプションメニューを表示
+            function showOptions(cell) {
+                // 既存のオプションメニューがあれば閉じる
+                if (currentOptions) {
+                    currentOptions.remove();
+                }
+                
+                // クリックされた要素が科目ブロックやコンテナの場合、表示位置調整
+                let targetElement = cell;
+                if (cell.classList.contains('subject-block') || cell.classList.contains('multi-cell-container')) {
+                    targetElement = cell;
+                }
+                
+                // 新しいオプションメニューを作成
+                const options = document.createElement('div');
+                options.className = 'options';
+                
+                // 編集ボタン
+                const editBtn = document.createElement('button');
+                editBtn.textContent = '編集';
+                editBtn.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    openSubjectForm();
+                    options.remove();
+                });
+                
+                // 削除ボタン
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '削除';
+                deleteBtn.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    clearSubject();
+                    options.remove();
+                });
+                
+                // ボタンをメニューに追加
+                options.appendChild(editBtn);
+                options.appendChild(deleteBtn);
+                
+                // メニューを配置
+                const rect = targetElement.getBoundingClientRect();
+                options.style.top = (rect.bottom + window.scrollY) + 'px';
+                options.style.left = (rect.left + window.scrollX) + 'px';
+                
+                // メニューをDOMに追加
+                document.body.appendChild(options);
+                currentOptions = options;
+                
+                // 他の場所をクリックしたらメニューを閉じる
+                document.addEventListener('click', handleDocumentClick);
+            }
+            
+            // ドキュメントクリックハンドラ
+            function handleDocumentClick(event) {
+                if (currentOptions && !currentOptions.contains(event.target) && event.target !== currentCell) {
+                    currentOptions.remove();
+                    currentOptions = null;
+                    document.removeEventListener('click', handleDocumentClick);
+                }
+            }
+            
+            // 科目入力フォームを開く
+            function openSubjectForm() {
+                const form = document.getElementById('subjectForm');
+                const overlay = document.getElementById('overlay');
+                
+                if (!form || !overlay) {
+                    console.error('フォームまたはオーバーレイ要素が見つかりません');
+                    return;
+                }
+                
+                // 既存のオプションメニューがあれば閉じる
+                if (currentOptions) {
+                    currentOptions.remove();
+                    currentOptions = null;
+                }
+                
+                // 保存済み科目のセレクトボックスを更新
+                updateSavedSubjectsSelect();
+                
+                // 保存済み科目選択をリセット
+                document.getElementById('savedSubjects').value = '';
+                
+                // 現在のセルの情報
+                const quarter = currentCell.getAttribute('data-quarter');
+                const day = currentCell.getAttribute('data-day');
+                const time = parseInt(currentCell.getAttribute('data-time'));
+                
+                // 既存のデータを取得
+                let subjectData = null;
+                let startPeriod = time;
+                let endPeriod = time;
+                
+                if (!currentCell.classList.contains('empty')) {
+                    // マルチセルコンテナがある場合、その情報を取得
+                    if (currentCell.multiCellContainer) {
+                        const periodRange = currentCell.multiCellContainer.getAttribute('data-period-range');
+                        if (periodRange) {
+                            [startPeriod, endPeriod] = periodRange.split('-').map(Number);
+                        }
+                    } else if (currentCell.closest('td')?.querySelector('.multi-cell-container')) {
+                        const container = currentCell.closest('td').querySelector('.multi-cell-container');
+                        if (container) {
+                            const periodRange = container.getAttribute('data-period-range');
+                            if (periodRange) {
+                                [startPeriod, endPeriod] = periodRange.split('-').map(Number);
+                            }
+                        }
+                    }
+                    
+                    // scheduleMapからデータを取得
+                    subjectData = scheduleMap[quarter][day][time];
+                    
+                    if (subjectData) {
+                        document.getElementById('subjectName').value = subjectData.name;
+                        document.getElementById('subjectRoom').value = subjectData.room || '';
+                        document.getElementById('subjectType').value = subjectData.type;
+                    } else {
+                        // セルからデータを取得（scheduleMapから取得できない場合のフォールバック）
+                        document.getElementById('subjectName').value = currentCell.querySelector('.subject-name')?.textContent || '';
+                        document.getElementById('subjectRoom').value = currentCell.querySelector('.subject-room')?.textContent || '';
+                        
+                        // 科目タイプを判定
+                        let type = 'required';
+                        if (currentCell.classList.contains('required')) type = 'required';
+                        else if (currentCell.classList.contains('elective')) type = 'elective';
+                        else if (currentCell.classList.contains('other')) type = 'other';
+                        else if (currentCell.classList.contains('masters')) type = 'masters';
+                        
+                        document.getElementById('subjectType').value = type;
+                    }
+                } else {
+                    // 新規追加の場合はフォームをクリア
+                    document.getElementById('subjectName').value = '';
+                    document.getElementById('subjectRoom').value = '';
+                    document.getElementById('subjectType').value = 'required';
+                }
+                
+                // バルク更新のチェックボックスをリセット
+                document.getElementById('bulkUpdate').checked = false;
+                
+                // 時限選択フィールドの設定
+                document.getElementById('startTime').value = startPeriod;
+                document.getElementById('endTime').value = endPeriod;
+                
+                // フォームとオーバーレイを表示
+                form.classList.remove('hidden');
+                overlay.classList.remove('hidden');
+                
+                // 科目名入力欄にフォーカス
+                document.getElementById('subjectName').focus();
+            }
+            
+            // 科目入力フォームを閉じる
+            function closeSubjectForm() {
+                const form = document.getElementById('subjectForm');
+                const overlay = document.getElementById('overlay');
+                
+                if (form) form.classList.add('hidden');
+                if (overlay) overlay.classList.add('hidden');
+            }
+            
+            // 科目を保存 (完全に書き直し)
+            function saveSubject() {
+                const subjectName = document.getElementById('subjectName').value;
+                const subjectRoom = document.getElementById('subjectRoom').value;
+                const subjectType = document.getElementById('subjectType').value;
+                const startPeriod = parseInt(document.getElementById('startTime').value);
+                const endPeriod = parseInt(document.getElementById('endTime').value);
+                const bulkUpdate = document.getElementById('bulkUpdate').checked;
+                
+                // 科目名が空の場合は保存しない
+                if (!subjectName.trim()) {
+                    alert('科目名を入力してください');
+                    return;
+                }
+                
+                // 時限が逆になっていないか確認
+                if (startPeriod > endPeriod) {
+                    alert('開始時限は終了時限より前にしてください');
+                    return;
+                }
+                
+                // 科目カタログに追加
+                subjectCatalog[subjectName] = {
+                    name: subjectName,
+                    room: subjectRoom,
+                    type: subjectType
+                };
+                
+                // 科目カタログを保存
+                saveSubjectCatalog();
+                
+                // 現在の四半期と曜日を取得
+                const quarter = currentCell.getAttribute('data-quarter');
+                const day = currentCell.getAttribute('data-day');
+                
+                // 元のセル情報を取得（編集前の範囲特定用）
+                let originalStartPeriod = null;
+                let originalEndPeriod = null;
+                let isEditing = false;
+                let originalName = "";
+                
+                // 編集中かどうかの判定と元の時間枠を特定
+                if (!currentCell.classList.contains('empty')) {
+                    isEditing = true;
+                    
+                    // 現在のセルが属する科目のデータを取得
+                    const currentTime = parseInt(currentCell.getAttribute('data-time'));
+                    const currentData = scheduleMap[quarter][day][currentTime];
+                    
+                    if (currentData) {
+                        originalName = currentData.name;
+                        originalStartPeriod = currentData.startPeriod;
+                        originalEndPeriod = currentData.endPeriod;
+                    } else {
+                        // scheduleMapからデータを取得できない場合のフォールバック
+                        originalName = currentCell.querySelector('.subject-name')?.textContent || '';
+                        
+                        if (currentCell.multiCellContainer) {
+                            const periodRange = currentCell.multiCellContainer.getAttribute('data-period-range');
+                            if (periodRange) {
+                                [originalStartPeriod, originalEndPeriod] = periodRange.split('-').map(Number);
+                            } else {
+                                originalStartPeriod = originalEndPeriod = currentTime;
+                            }
+                        } else if (currentCell.closest('td')?.querySelector('.multi-cell-container')) {
+                            const container = currentCell.closest('td').querySelector('.multi-cell-container');
+                            const periodRange = container?.getAttribute('data-period-range');
+                            if (periodRange) {
+                                [originalStartPeriod, originalEndPeriod] = periodRange.split('-').map(Number);
+                            } else {
+                                originalStartPeriod = originalEndPeriod = currentTime;
+                            }
+                        } else {
+                            originalStartPeriod = originalEndPeriod = currentTime;
+                        }
+                    }
+                }
+                
+                console.log(`処理: ${isEditing ? '編集' : '新規追加'}, 元の時間枠: ${originalStartPeriod}-${originalEndPeriod}限, 新しい時間枠: ${startPeriod}-${endPeriod}限`);
+                
+                // 重複チェック（通知目的だけで、処理は続行する）
+                const overlappingSubjects = [];
+                
+                // 現在のセル（編集中）が含まれる科目は重複とみなさない
+                for (let period = startPeriod; period <= endPeriod; period++) {
+                    const existingData = scheduleMap[quarter][day][period];
+                    
+                    if (existingData && !(isEditing && 
+                        existingData.name === originalName && 
+                        existingData.startPeriod === originalStartPeriod && 
+                        existingData.endPeriod === originalEndPeriod)) {
+                        
+                        // このデータがまだ登録されていなければ追加
+                        if (!overlappingSubjects.some(s => s.name === existingData.name && 
+                                                        s.startPeriod === existingData.startPeriod && 
+                                                        s.endPeriod === existingData.endPeriod)) {
+                            overlappingSubjects.push(existingData);
+                        }
+                    }
+                }
+                
+                // 重複する科目がある場合、確認（ただし処理は続行）
+                if (overlappingSubjects.length > 0) {
+                    const subjectNames = overlappingSubjects.map(s => s.name).join('、');
+                    const confirm = window.confirm(`新しい時間枠は既存の科目「${subjectNames}」と重複します。重複する科目は上書きされます。続けますか？`);
+                    if (!confirm) {
+                        return; // キャンセルした場合のみ中止
+                    }
+                }
+                
+                // 編集中の場合、元のデータを削除
+                if (isEditing && originalStartPeriod && originalEndPeriod) {
+                    // まず元のデータをscheduleMapから完全に削除
+                    clearSubjectFromSchedule(quarter, day, originalStartPeriod, originalEndPeriod);
+                    
+                    // 元の科目のDOM要素をすべて削除
+                    const originalCells = getTimeSlotsInRange(quarter, day, originalStartPeriod, originalEndPeriod);
+                    originalCells.forEach(cell => {
+                        resetCellToEmpty(cell);
+                    });
+                }
+
+                // 重複する科目がある場合、その科目を削除
+                overlappingSubjects.forEach(subject => {
+                    // 重複科目のデータをscheduleMapから削除
+                    clearSubjectFromSchedule(quarter, day, subject.startPeriod, subject.endPeriod);
+                    
+                    // 重複科目のDOM要素を削除
+                    const overlapCells = getTimeSlotsInRange(quarter, day, subject.startPeriod, subject.endPeriod);
+                    overlapCells.forEach(cell => {
+                        resetCellToEmpty(cell);
+                    });
+                });
+
+                // 新しいデータを保存する前に、新しい範囲のセルも完全にクリア
+                const newCells = getTimeSlotsInRange(quarter, day, startPeriod, endPeriod);
+                newCells.forEach(cell => {
+                    resetCellToEmpty(cell);
+                });
+                
+                // 完全にきれいな状態になったので、新しいデータを保存
+                saveSubjectToSchedule(quarter, day, startPeriod, endPeriod, subjectName, subjectRoom, subjectType);
+                
+                // 新しい科目のみ表示するため、個別にレンダリング
+                const finalCells = getTimeSlotsInRange(quarter, day, startPeriod, endPeriod);
+                if (startPeriod === endPeriod) {
+                    // 単一時限の場合
+                    if (finalCells.length > 0) {
+                        updateSubjectCell(finalCells[0], subjectName, subjectRoom, subjectType);
+                    }
+                } else {
+                    // 複数時限の場合
+                    if (finalCells.length > 0) {
+                        createMultiPeriodCell(finalCells, subjectName, subjectRoom, subjectType, startPeriod, endPeriod);
+                    }
+                }
+                
+                // フォームを閉じる
+                closeSubjectForm();
+                
+                // 同じ名前の講義を一括変更する場合
+                if (bulkUpdate && isEditing && originalName !== subjectName) {
+                    updateAllSubjectsWithName(originalName, subjectName, subjectRoom, subjectType);
+                } else {
+                    showNotification(`「${subjectName}」を保存しました`);
+                }
+                
+                // ローカルストレージにデータを保存
+                saveAllTimetableData();
+            }
+
+            // 科目を削除
+            function clearSubject() {
+                if (!currentCell) return;
+                
+                // クリックされた要素が科目ブロックやコンテナの場合、親セルを特定
+                if (currentCell.classList.contains('subject-block') || currentCell.classList.contains('multi-cell-container')) {
+                    const containerElement = currentCell.classList.contains('multi-cell-container') ? 
+                        currentCell : currentCell.closest('.multi-cell-container');
+                    
+                    if (containerElement) {
+                        // コンテナから親セルを見つける
+                        const parentTd = containerElement.closest('td');
+                        if (parentTd) {
+                            const subjectElement = parentTd.querySelector('.subject');
+                            if (subjectElement) {
+                                currentCell = subjectElement;
+                            }
+                        }
+                    }
+                }
+                
+                // 期間範囲を特定
+                let targetStartPeriod = null;
+                let targetEndPeriod = null;
+                let quarter = currentCell.getAttribute('data-quarter');
+                let day = currentCell.getAttribute('data-day');
+                let time = parseInt(currentCell.getAttribute('data-time'));
+                
+                // scheduleMapからデータを取得
+                const subjectData = scheduleMap[quarter][day][time];
+                
+                if (subjectData) {
+                    // scheduleMapからデータが取得できた場合
+                    targetStartPeriod = subjectData.startPeriod;
+                    targetEndPeriod = subjectData.endPeriod;
+                } else {
+                    // scheduleMapからデータが取得できない場合は、DOMから取得
+                    if (currentCell.multiCellContainer) {
+                        const periodRange = currentCell.multiCellContainer.getAttribute('data-period-range');
+                        if (periodRange) {
+                            [targetStartPeriod, targetEndPeriod] = periodRange.split('-').map(Number);
+                        } else {
+                            targetStartPeriod = targetEndPeriod = time;
+                        }
+                    } else if (currentCell.closest('td')?.querySelector('.multi-cell-container')) {
+                        const container = currentCell.closest('td').querySelector('.multi-cell-container');
+                        const periodRange = container.getAttribute('data-period-range');
+                        if (periodRange) {
+                            [targetStartPeriod, targetEndPeriod] = periodRange.split('-').map(Number);
+                        } else {
+                            targetStartPeriod = targetEndPeriod = time;
+                        }
+                    } else {
+                        targetStartPeriod = targetEndPeriod = time;
+                    }
+                }
+                
+                // 科目を削除
+                if (targetStartPeriod && targetEndPeriod) {
+                    // scheduleMapからデータを削除
+                    clearSubjectFromSchedule(quarter, day, targetStartPeriod, targetEndPeriod);
+                    
+                    // 該当セルをすべてリセット
+                    const cells = getTimeSlotsInRange(quarter, day, targetStartPeriod, targetEndPeriod);
+                    cells.forEach(cell => {
+                        resetCellToEmpty(cell);
+                    });
+                    
+                    // 通知を表示
+                    showNotification(`科目を削除しました`);
+                    
+                    // データを保存
+                    saveAllTimetableData();
+                }
+            }
+            
+            function updateSubjectCell(cell, name, room, type) {
+                if (!cell) return;
+                
+                // セル内容をクリア
+                cell.innerHTML = '';
+                cell.className = 'subject ' + type;
+                cell.style.margin = '4px';
+                cell.style.width = 'calc(100% - 8px)';
+                cell.style.display = 'flex';
+                cell.style.flexDirection = 'column';
+                cell.style.justifyContent = 'center';
+                cell.style.alignItems = 'center';
+                
+                // 科目名要素を作成
+                const nameElement = document.createElement('div');
+                nameElement.className = 'subject-name';
+                nameElement.textContent = name;
+                nameElement.style.width = '100%';
+                nameElement.style.textAlign = 'center';
+                nameElement.style.marginBottom = '6px';
+                nameElement.style.wordWrap = 'break-word';
+                cell.appendChild(nameElement);
+                
+                // 教室要素を作成（存在する場合）
+                if (room) {
+                    const roomElement = document.createElement('div');
+                    roomElement.className = 'subject-room';
+                    roomElement.textContent = room;
+                    roomElement.style.display = 'block'; // ブロック要素として表示
+                    roomElement.style.margin = '3px auto';
+                    roomElement.style.textAlign = 'center';
+                    roomElement.style.backgroundColor = 'rgba(255,255,255,0.7)';
+                    roomElement.style.padding = '3px 8px';
+                    roomElement.style.borderRadius = '12px';
+                    roomElement.style.border = '1px solid rgba(0,0,0,0.05)';
+                    roomElement.style.width = 'auto';
+                    roomElement.style.maxWidth = '90%';
+                    cell.appendChild(roomElement);
+                }
+            }
+            
+            // 同じ名前の科目をすべて更新
+            function updateAllSubjectsWithName(originalName, newName, newRoom, newType) {
+                const quarters = [1, 2, 3, 4];
+                const days = ['mon', 'tue', 'wed', 'thu', 'fri'];
+                let updatedCount = 0;
+                
+                // scheduleMapのすべての項目をチェック
+                for (const quarter of quarters) {
+                    for (const day of days) {
+                        // 処理済みの範囲を記録
+                        const processedRanges = [];
+                        
+                        for (let period = 1; period <= 10; period++) {
+                            // 既に処理済みの範囲はスキップ
+                            if (processedRanges.some(range => period >= range.start && period <= range.end)) {
+                                continue;
+                            }
+                            
+                            const subjectData = scheduleMap[quarter][day][period];
+                            if (subjectData && subjectData.name === originalName) {
+                                // この科目の範囲
+                                const startPeriod = subjectData.startPeriod;
+                                const endPeriod = subjectData.endPeriod;
+                                
+                                // この範囲を処理済みとしてマーク
+                                processedRanges.push({
+                                    start: startPeriod,
+                                    end: endPeriod
+                                });
+                                
+                                // データを更新
+                                saveSubjectToSchedule(quarter, day, startPeriod, endPeriod, newName, newRoom, newType);
+                                updatedCount++;
+                            }
+                        }
+                    }
+                }
+                
+                // 時間割を再レンダリング
+                renderTimetable();
+                
+                // 通知を表示
+                showNotification(`「${originalName}」を「${newName}」に一括変更しました (${updatedCount}件)`);
+                
+                // データを保存
+                saveAllTimetableData();
+            }
+            
+            // 通知を表示
+            function showNotification(message) {
+                // 既存の通知があれば削除
+                const existingNotification = document.querySelector('.notification');
+                if (existingNotification) {
+                    existingNotification.remove();
+                }
+                
+                // 新しい通知を作成
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = message;
+                
+                // DOMに追加
+                document.body.appendChild(notification);
+                
+                // 表示アニメーション
+                setTimeout(() => {
+                    notification.style.opacity = '1';
+                    notification.style.transform = 'translateY(0)';
+                }, 10);
+                
+                // 数秒後に削除
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateY(20px)';
+                    
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 3000);
+            }
+            
+            // 科目カタログをロード
+            function loadSubjectCatalog() {
+                try {
+                    const savedCatalog = localStorage.getItem('subjectCatalog');
+                    if (savedCatalog) {
+                        subjectCatalog = JSON.parse(savedCatalog);
+                        console.log('科目カタログをロードしました');
+                    }
+                } catch (error) {
+                    console.error('科目カタログのロードに失敗しました:', error);
+                    subjectCatalog = {};
+                }
+            }
+            
+            // 科目カタログを保存
+            function saveSubjectCatalog() {
+                try {
+                    localStorage.setItem('subjectCatalog', JSON.stringify(subjectCatalog));
+                    console.log('科目カタログを保存しました');
+                } catch (error) {
+                    console.error('科目カタログの保存に失敗しました:', error);
+                }
+            }
+            
+            // 全データをローカルストレージに保存
+            function saveAllTimetableData() {
+                try {
+                    localStorage.setItem('scheduleMap', JSON.stringify(scheduleMap));
+                    console.log('時間割データを保存しました');
+                } catch (error) {
+                    console.error('データ保存エラー:', error);
+                }
+            }
+            
+            // ローカルストレージからデータをロード
+            function loadAllTimetableData() {
+                try {
+                    const savedData = localStorage.getItem('scheduleMap');
+                    if (savedData) {
+                        scheduleMap = JSON.parse(savedData);
+                        console.log('時間割データをロードしました');
+                        renderTimetable();
+                    } else {
+                        initScheduleMap(); // データがなければ初期化
+                    }
+                } catch (error) {
+                    console.error('データロードエラー:', error);
+                    initScheduleMap(); // エラー時も初期化
+                }
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 背景 -->
+  <rect width="512" height="512" fill="#3f51b5" rx="100" ry="100"/>
+  
+  <!-- カレンダーの背景 -->
+  <rect x="80" y="120" width="352" height="312" fill="white" rx="15" ry="15"/>
+  
+  <!-- カレンダーの上部バー -->
+  <rect x="80" y="120" width="352" height="50" fill="#e84393" rx="15" ry="15"/>
+  
+  <!-- カレンダーの曜日部分 -->
+  <rect x="110" y="190" width="50" height="30" fill="#f0f3f8" rx="5" ry="5"/>
+  <rect x="180" y="190" width="50" height="30" fill="#f0f3f8" rx="5" ry="5"/>
+  <rect x="250" y="190" width="50" height="30" fill="#f0f3f8" rx="5" ry="5"/>
+  <rect x="320" y="190" width="50" height="30" fill="#f0f3f8" rx="5" ry="5"/>
+  
+  <!-- 時限部分 -->
+  <rect x="110" y="240" width="50" height="40" fill="#b3e5fc" rx="5" ry="5"/>
+  <rect x="180" y="240" width="50" height="40" fill="#ffcdd2" rx="5" ry="5"/>
+  <rect x="250" y="240" width="50" height="40" fill="#c8e6c9" rx="5" ry="5"/>
+  <rect x="320" y="240" width="50" height="40" fill="#d1c4e9" rx="5" ry="5"/>
+  
+  <rect x="110" y="300" width="50" height="40" fill="#ffcdd2" rx="5" ry="5"/>
+  <rect x="180" y="300" width="50" height="40" fill="#c8e6c9" rx="5" ry="5"/>
+  <rect x="250" y="300" width="50" height="40" fill="#b3e5fc" rx="5" ry="5"/>
+  <rect x="320" y="300" width="50" height="40" fill="#fff9c4" rx="5" ry="5"/>
+  
+  <rect x="110" y="360" width="50" height="40" fill="#c8e6c9" rx="5" ry="5"/>
+  <rect x="180" y="360" width="50" height="40" fill="#d1c4e9" rx="5" ry="5"/>
+  <rect x="250" y="360" width="50" height="40" fill="#ffcdd2" rx="5" ry="5"/>
+  <rect x="320" y="360" width="50" height="40" fill="#b3e5fc" rx="5" ry="5"/>
+  
+  <!-- 時計のアイコン -->
+  <circle cx="430" cy="80" r="30" fill="white"/>
+  <circle cx="430" cy="80" r="27" fill="none" stroke="#3f51b5" stroke-width="3"/>
+  <line x1="430" y1="80" x2="430" y2="65" stroke="#3f51b5" stroke-width="3" stroke-linecap="round"/>
+  <line x1="430" y1="80" x2="440" y2="85" stroke="#3f51b5" stroke-width="3" stroke-linecap="round"/>
+</svg>
