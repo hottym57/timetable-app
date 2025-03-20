@@ -2,8 +2,16 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>大学4年生 時間割表</title>
+    <!-- 以下のPWA関連のメタタグとリンクを追加 -->
+    <meta name="theme-color" content="#3f51b5">
+    <meta name="description" content="大学4年生のための時間割管理アプリ">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="時間割">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-152x152.png">
     <style>
         body {
             font-family: 'Roboto', 'Segoe UI', 'Helvetica', 'Arial', sans-serif;
@@ -683,6 +691,137 @@
             display: inline-block; /* インラインブロック要素として表示 */
             border: 1px solid rgba(0,0,0,0.05);
         }
+
+        /* スマートフォン縦画面対応用のスタイル */
+        @media screen and (max-width: 768px) {
+            /* コンテナのパディングを減らす */
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 10px;
+                gap: 15px;
+            }
+            
+            /* 見出しのサイズを調整 */
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 15px;
+            }
+            
+            /* 凡例を縦に並べる */
+            .legend {
+                flex-direction: column;
+                gap: 8px;
+                padding: 8px;
+            }
+            
+            .legend-item {
+                padding: 4px 10px;
+            }
+            
+            /* テーブルのレイアウト調整 */
+            table {
+                table-layout: fixed;
+                font-size: 0.9em;
+            }
+            
+            th, td {
+                padding: 2px !important;
+            }
+            
+            .time-col {
+                width: 12%;
+            }
+            
+            td:not(.time-col) {
+                padding: 4px !important;
+            }
+            
+            .subject {
+                min-height: 70px;
+                margin: 2px;
+                padding: 4px;
+            }
+            
+            .subject-name {
+                font-size: 0.9em;
+                margin-bottom: 4px;
+            }
+            
+            .subject-room {
+                font-size: 0.7em;
+                padding: 2px 6px;
+            }
+            
+            /* フォームのスタイル調整 */
+            #subjectForm {
+                width: 90%;
+                padding: 20px;
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            .form-actions button {
+                padding: 8px 15px;
+            }
+        }
+
+        /* スマートフォン小型画面用のさらなる調整 */
+        @media screen and (max-width: 480px) {
+            /* さらに小さな画面向けの調整 */
+            h1 {
+                font-size: 1.5em;
+            }
+            
+            .tab {
+                padding: 8px 15px;
+                font-size: 0.85em;
+            }
+            
+            /* テーブルを横スクロール可能にする */
+            .quarter-content {
+                overflow-x: auto;
+            }
+            
+            table {
+                min-width: 450px; /* 最小幅を設定 */
+            }
+            
+            .time-col {
+                width: 15%;
+            }
+            
+            .subject {
+                min-height: 60px;
+            }
+            
+            .subject-name {
+                font-size: 0.8em;
+            }
+        }
+
+        /* 横向きモバイルデバイス用 */
+        @media screen and (min-width: 481px) and (max-width: 768px) {
+            .subject {
+                min-height: 80px;
+            }
+        }
+
+        /* タブレット用 */
+        @media screen and (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .subject {
+                min-height: 85px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -2263,6 +2402,129 @@
                 }
             }
         })();
+
+        // モバイル対応のためのコード
+        function setupResponsiveFeatures() {
+            // ビューポートの幅を取得
+            const viewportWidth = window.innerWidth;
+            
+            // モバイルサイズ（768px以下）の場合の調整
+            if (viewportWidth <= 768) {
+                // フォームの位置調整
+                adjustFormPositionForMobile();
+                
+                // 時間割の高さを調整
+                adjustSubjectCellHeight();
+            }
+        }
+
+        // モバイルデバイスでのフォーム位置調整
+        function adjustFormPositionForMobile() {
+            const form = document.getElementById('subjectForm');
+            if (!form) return;
+            
+            // フォームが表示されたときの処理
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class' && 
+                        !form.classList.contains('hidden')) {
+                        
+                        // スクロール位置を上部に
+                        window.scrollTo(0, 0);
+                        
+                        // フォームのスタイル調整
+                        form.style.height = 'auto';
+                        form.style.maxHeight = '90vh';
+                        form.style.overflowY = 'auto';
+                    }
+                });
+            });
+            
+            observer.observe(form, { attributes: true });
+        }
+
+        // 画面サイズに合わせて科目セルの高さを調整
+        function adjustSubjectCellHeight() {
+            const subjects = document.querySelectorAll('.subject');
+            const viewportWidth = window.innerWidth;
+            
+            // 画面サイズに応じて高さを決定
+            let cellHeight = '60px';
+            if (viewportWidth <= 480) {
+                cellHeight = '60px';
+            } else if (viewportWidth <= 768) {
+                cellHeight = '70px';
+            }
+            
+            subjects.forEach(subject => {
+                subject.style.minHeight = cellHeight;
+            });
+        }
+
+        // リサイズ時にも対応
+        window.addEventListener('resize', function() {
+            setupResponsiveFeatures();
+        });
+
+        // 初期化処理に追加
+        document.addEventListener('DOMContentLoaded', function() {
+            setupResponsiveFeatures();
+        });
+
+        // 縦向き/横向きの変更を検出
+        window.addEventListener('orientationchange', function() {
+            // 少し遅延させて実行（レイアウト調整のため）
+            setTimeout(function() {
+                setupResponsiveFeatures();
+            }, 300);
+        });
+    </script>
+    <!-- body終了タグの前に追加 -->
+    <script>
+        // Service Workerの登録
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('Service Workerの登録に成功しました。Scope:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Service Workerの登録に失敗しました:', error);
+                    });
+            });
+        }
+
+        // インストールプロンプト用の変数
+        let deferredPrompt;
+
+        // beforeinstallpromptイベントをキャプチャ
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // デフォルトのプロンプトを防ぐ
+            e.preventDefault();
+            // 後で使うためにイベントを保存
+            deferredPrompt = e;
+            // インストールボタンを表示するなどの処理をここに追加できます
+        });
+
+        // インストールボタンクリック時の処理を追加することもできます
+        /* 
+        installButton.addEventListener('click', (e) => {
+            // インストールボタンを非表示
+            installButton.style.display = 'none';
+            // インストールプロンプトを表示
+            deferredPrompt.prompt();
+            // ユーザーの選択結果を待つ
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('ユーザーがインストールを承諾しました');
+                } else {
+                    console.log('ユーザーがインストールを拒否しました');
+                }
+                // イベントを解放
+                deferredPrompt = null;
+            });
+        });
+        */
     </script>
 </body>
 </html>
