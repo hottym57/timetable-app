@@ -67,15 +67,11 @@
             overflow: hidden;
             box-shadow: 0 5px 20px rgba(0,0,0,0.07);
             background: white;
-            transform: scale(0.65);
-            transform-origin: top left;
-            margin-bottom: -15%;
-            margin-right: -15%;
         }
 
         th, td {
             border: none;
-            padding: 2px !important;
+            padding: 4px !important;
             text-align: center;
             position: relative;
         }
@@ -87,15 +83,17 @@
             text-transform: uppercase;
             font-size: 0.85em;
             letter-spacing: 1px;
+            white-space: nowrap;
+            padding: 8px 4px !important;
         }
 
         .time-col {
-            width: 8%;
             background: linear-gradient(to bottom, #283593, #1a237e);
             color: white;
             font-weight: 600;
             font-size: 0.8em;
             padding: 2px !important;
+            white-space: nowrap;
         }
 
         td:not(.time-col) {
@@ -105,7 +103,7 @@
         }
 
         .subject {
-            min-height: 40px;
+            min-height: 80px;
             cursor: pointer;
             border-radius: 8px;
             margin: 4px;
@@ -168,7 +166,7 @@
         }
 
         .subject-room {
-            font-size: 0.7em;
+            font-size: 0.75em;
             color: #444;
             background-color: rgba(255,255,255,0.7);
             padding: 2px 6px;
@@ -186,9 +184,10 @@
         .legend {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
             margin: 5px 0 8px;
-            padding: 5px;
+            padding: 8px;
             background: linear-gradient(to right, rgba(255,255,255,0.9), rgba(245,245,245,0.9));
             border-radius: 10px;
             box-shadow: 0 3px 10px rgba(0,0,0,0.05);
@@ -277,13 +276,14 @@
 
         .quarter-content {
             display: none;
+            width: 100%;
         }
 
         .quarter-content.active {
             display: block;
-            overflow-x: auto;
             width: 100%;
-            padding-bottom: 15px; /* 下部にスクロールバーのスペースを確保 */
+            padding-bottom: 15px;
+            overflow-x: auto;
         }
 
         /* オプションメニュー */
@@ -324,6 +324,8 @@
             z-index: 100;
             width: 400px;
             max-width: 95vw;
+            max-height: 90vh;
+            overflow-y: auto;
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.8);
         }
@@ -700,41 +702,139 @@
             border: 1px solid rgba(0,0,0,0.05);
         }
 
+        /* ズームコントロール用のスタイル */
+        .zoom-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+            padding: 5px 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .zoom-btn {
+            background: linear-gradient(to bottom, #3949ab, #303f9f);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .zoom-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+        }
+
+        .zoom-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .zoom-level {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .zoom-reset {
+            background: linear-gradient(to bottom, #f5f5f5, #e0e0e0);
+            color: #333;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .zoom-reset:hover {
+            background: linear-gradient(to bottom, #eeeeee, #d5d5d5);
+        }
+
+        /* ズーム効果用のスタイル */
+        .timetable-container {
+            overflow: auto;
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .timetable-zoom {
+            transform-origin: top left;
+            transition: transform 0.3s ease;
+            display: inline-block; /* インラインブロックに変更 */
+        }
+
+        /* ズーム時のテーブルスタイル */
+        .timetable-zoom table {
+            margin: 0; /* マージンをリセット */
+        }
+
+        /* ダブルカラムレイアウト（時間割表の横に詳細エリアを追加）*/
+        @media screen and (min-width: 1025px) {
+            .container {
+                max-width: 1400px;
+            }
+            
+            .subject {
+                min-height: 85px;
+            }
+        }
+
         /* スマートフォン縦画面対応用のスタイル */
         @media screen and (max-width: 768px) {
             /* コンテナのパディングを減らす */
             body {
-                padding: 10px;
+                padding: 8px;
             }
             
             .container {
-                padding: 10px;
-                gap: 15px;
+                padding: 8px;
+                gap: 10px;
             }
             
             /* 見出しのサイズを調整 */
             h1 {
-                font-size: 1.8em;
-                margin-bottom: 15px;
+                font-size: 1.5em;
+                margin-bottom: 10px;
             }
             
             /* 凡例を縦に並べる */
             .legend {
-                flex-direction: column;
-                gap: 8px;
-                padding: 8px;
+                padding: 6px;
+                gap: 5px;
             }
             
             .legend-item {
-                padding: 4px 10px;
+                padding: 3px 8px;
+                font-size: 0.8em;
             }
             
             /* テーブルのレイアウト調整 */
             table {
-                transform: scale(0.6);
-                transform-origin: top left;
-                margin-bottom: -20%;
-                margin-right: -20%;
+                width: auto;
+                min-width: 100%;
+            }
+            
+            .quarter-content.active {
+                max-width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
             
             th, td {
@@ -742,132 +842,194 @@
             }
             
             .time-col {
-                width: 12%;
+                width: 45px;
+                font-size: 0.7em;
+                white-space: nowrap;
+            }
+            
+            th {
+                white-space: nowrap;
+                padding: 6px 8px !important;
+                font-size: 0.8em;
             }
             
             td:not(.time-col) {
-                padding: 4px !important;
+                padding: 3px !important;
+                min-width: 70px;
             }
             
             .subject {
-                min-height: 35px;
+                min-height: 60px;
                 margin: 2px;
                 padding: 4px;
             }
             
             .subject-name {
-                font-size: 0.9em;
-                margin-bottom: 4px;
+                font-size: 0.85em;
+                margin-bottom: 3px;
             }
             
             .subject-room {
-                font-size: 0.7em;
-                padding: 2px 6px;
+                font-size: 0.65em;
+                padding: 1px 4px;
+            }
+            
+            /* タブサイズ調整 */
+            .tab {
+                padding: 6px 12px;
+                font-size: 0.9em;
             }
             
             /* フォームのスタイル調整 */
             #subjectForm {
-                width: 90%;
-                padding: 20px;
+                width: 95%;
+                padding: 16px;
+                max-height: 85vh;
+                overflow-y: auto;
             }
             
             .form-group {
-                margin-bottom: 15px;
+                margin-bottom: 12px;
+            }
+            
+            .form-group label {
+                margin-bottom: 4px;
+                font-size: 0.9em;
+            }
+            
+            .form-group input, .form-group select {
+                padding: 10px;
+                font-size: 0.9em;
             }
             
             .form-actions button {
                 padding: 8px 15px;
+                font-size: 0.9em;
             }
         }
 
-        /* スマートフォン小型画面用のさらなる調整 */
-        @media screen and (max-width: 480px) {
-            /* さらに小さな画面向けの調整 */
+        /* 極小スマートフォン対応 */
+        @media screen and (max-width: 350px) {
+            body {
+                padding: 5px;
+            }
+            
+            .container {
+                padding: 5px;
+            }
+            
             h1 {
-                font-size: 1.5em;
+                font-size: 1.3em;
             }
             
-            .tab {
-                padding: 8px 15px;
-                font-size: 0.85em;
-            }
-            
-            /* テーブルを横スクロール可能にする */
-            .quarter-content {
-                overflow-x: auto;
-            }
-            
-            table {
-                transform: scale(0.5);
-                transform-origin: top left;
-                margin-bottom: -25%;
-                margin-right: -25%;
+            .subject {
+                min-height: 50px;
+                padding: 3px;
             }
             
             .time-col {
-                width: 15%;
+                width: 40px;
+                font-size: 0.65em;
             }
             
-            .subject {
-                min-height: 30px;
+            th {
+                font-size: 0.7em;
+                padding: 4px !important;
             }
             
-            .subject-name {
+            .tab {
+                padding: 5px 8px;
                 font-size: 0.8em;
+            }
+            
+            .legend-item {
+                padding: 2px 6px;
+                font-size: 0.75em;
             }
         }
 
-        /* 横向きモバイルデバイス用 */
+        /* スマートフォン横向き用 */
         @media screen and (min-width: 481px) and (max-width: 768px) {
             .subject {
-                min-height: 50px;
+                min-height: 55px;
+            }
+            
+            td:not(.time-col) {
+                min-width: 80px;
             }
         }
 
         /* タブレット用 */
         @media screen and (min-width: 769px) and (max-width: 1024px) {
             .container {
-                padding: 15px;
+                padding: 12px;
             }
             
             .subject {
-                min-height: 55px;
+                min-height: 70px;
             }
             
-            table {
-                transform: scale(0.85);
-                margin-bottom: -8%;
+            td:not(.time-col) {
+                min-width: 100px;
+            }
+            
+            .time-col {
+                width: 50px;
             }
         }
 
         /* 画面高さが低い場合の調整 */
         @media screen and (max-height: 650px) {
-            table {
-                transform: scale(0.7);
-                margin-bottom: -15%;
-            }
-            
             .subject {
                 min-height: 45px;
             }
             
             h1 {
-                font-size: 1.5em;
-                margin-bottom: 8px;
+                font-size: 1.3em;
+                margin-bottom: 6px;
             }
             
             .legend {
-                margin: 5px 0 8px;
-                padding: 5px;
+                margin: 4px 0 6px;
+                padding: 4px;
             }
             
             .tabs {
-                margin-bottom: 5px;
+                margin-bottom: 4px;
             }
             
             .tab {
-                padding: 6px 15px;
+                padding: 5px 12px;
             }
+            
+            #subjectForm {
+                max-height: 90vh;
+            }
+        }
+
+        /* iOS Safariでの余分なスクロールを防止 */
+        html, body {
+            -webkit-overflow-scrolling: touch;
+            overflow-x: hidden;
+        }
+
+        /* スクロールバーのカスタマイズ */
+        .quarter-content::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .quarter-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 8px;
+        }
+
+        .quarter-content::-webkit-scrollbar-thumb {
+            background: #bec2c7;
+            border-radius: 8px;
+        }
+
+        .quarter-content::-webkit-scrollbar-thumb:hover {
+            background: #9ba1a8;
         }
     </style>
 </head>
@@ -1346,6 +1508,18 @@
         <div class="form-actions">
             <button class="btn-cancel" id="cancelSubject">キャンセル</button>
             <button class="btn-save" id="saveSubject">保存</button>
+        </div>
+    </div>
+
+    <div class="zoom-controls">
+        <button class="zoom-btn zoom-out" title="縮小">-</button>
+        <div class="zoom-level">100%</div>
+        <button class="zoom-btn zoom-in" title="拡大">+</button>
+        <button class="zoom-reset" title="リセット">リセット</button>
+    </div>
+    <div class="timetable-container">
+        <div class="timetable-zoom">
+            <!-- ここにテーブルを移動 -->
         </div>
     </div>
     
@@ -2507,6 +2681,179 @@
                 subject.style.minHeight = cellHeight;
             });
         }
+
+        // ズーム機能の実装
+        function setupZoomFeature() {
+            // 既存のズームコントロールを削除（重複防止）
+            document.querySelectorAll('.zoom-controls, .timetable-container').forEach(el => {
+                el.remove();
+            });
+
+            // 各クォーターコンテンツにズームコントロールとコンテナを追加
+            document.querySelectorAll('.quarter-content').forEach(quarter => {
+                // クォーター番号を取得
+                const quarterNum = quarter.id.replace('quarter', '');
+                
+                // 既存のテーブルを取得
+                const existingTable = quarter.querySelector('table');
+                if (!existingTable) return;
+                
+                // ズームコントロールを作成
+                const zoomControls = document.createElement('div');
+                zoomControls.className = 'zoom-controls';
+                zoomControls.innerHTML = `
+                    <button class="zoom-btn zoom-out" data-quarter="${quarterNum}" title="縮小">-</button>
+                    <div class="zoom-level" data-quarter="${quarterNum}">100%</div>
+                    <button class="zoom-btn zoom-in" data-quarter="${quarterNum}" title="拡大">+</button>
+                    <button class="zoom-reset" data-quarter="${quarterNum}" title="リセット">リセット</button>
+                `;
+                
+                // テーブルを一時的に保存
+                const tableHTML = existingTable.outerHTML;
+                
+                // 既存のテーブルを削除
+                existingTable.remove();
+                
+                // コンテナを作成
+                const container = document.createElement('div');
+                container.className = 'timetable-container';
+                
+                // ズーム用の内部コンテナを作成
+                const zoomContainer = document.createElement('div');
+                zoomContainer.className = 'timetable-zoom';
+                zoomContainer.setAttribute('data-quarter', quarterNum);
+                
+                // 新しいテーブルを作成して追加
+                zoomContainer.innerHTML = tableHTML;
+                
+                // 要素を配置
+                container.appendChild(zoomContainer);
+                
+                // 要素をクォーターに追加
+                quarter.appendChild(zoomControls);
+                quarter.appendChild(container);
+            });
+
+            // ズーム状態を管理する変数
+            const zoomState = {
+                levels: {1: 100, 2: 100, 3: 100, 4: 100}, // 各クォーターごとのズームレベル
+                min: 50,
+                max: 200,
+                step: 10
+            };
+
+            // ズームイベントハンドラーの設定 - 拡大ボタン
+            document.querySelectorAll('.zoom-btn.zoom-in').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const quarterNum = this.getAttribute('data-quarter');
+                    
+                    if (zoomState.levels[quarterNum] < zoomState.max) {
+                        zoomState.levels[quarterNum] += zoomState.step;
+                        updateZoom(quarterNum);
+                    }
+                });
+            });
+
+            // 縮小ボタン
+            document.querySelectorAll('.zoom-btn.zoom-out').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const quarterNum = this.getAttribute('data-quarter');
+                    
+                    if (zoomState.levels[quarterNum] > zoomState.min) {
+                        zoomState.levels[quarterNum] -= zoomState.step;
+                        updateZoom(quarterNum);
+                    }
+                });
+            });
+
+            // リセットボタン
+            document.querySelectorAll('.zoom-reset').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const quarterNum = this.getAttribute('data-quarter');
+                    
+                    zoomState.levels[quarterNum] = 100;
+                    updateZoom(quarterNum);
+                });
+            });
+
+            // ズームレベルの更新とスタイルの適用
+            function updateZoom(quarterNum) {
+                const scale = zoomState.levels[quarterNum] / 100;
+                const quarter = document.getElementById(`quarter${quarterNum}`);
+                
+                // ズームレベル表示を更新
+                const levelDisplay = quarter.querySelector('.zoom-level');
+                if (levelDisplay) {
+                    levelDisplay.textContent = `${zoomState.levels[quarterNum]}%`;
+                }
+                
+                // テーブルのズームを更新
+                const zoomContainer = quarter.querySelector('.timetable-zoom');
+                if (zoomContainer) {
+                    zoomContainer.style.transform = `scale(${scale})`;
+                    
+                    // コンテナの幅と高さを調整
+                    const container = zoomContainer.parentElement;
+                    const table = zoomContainer.querySelector('table');
+                    
+                    if (table && container) {
+                        // 拡大時は余白を増やす
+                        if (scale > 1) {
+                            const width = table.offsetWidth * scale;
+                            const height = table.offsetHeight * scale;
+                            zoomContainer.style.width = `${table.offsetWidth}px`;
+                            zoomContainer.style.height = `${table.offsetHeight}px`;
+                            container.style.minWidth = `${Math.min(width, window.innerWidth - 30)}px`;
+                            container.style.minHeight = `${height}px`;
+                        }
+                        // 縮小時は元のサイズに近づける
+                        else {
+                            zoomContainer.style.width = `${table.offsetWidth}px`;
+                            zoomContainer.style.height = `${table.offsetHeight}px`;
+                            container.style.minWidth = '';
+                            container.style.minHeight = '';
+                        }
+                    }
+                    
+                    // 変形の原点を設定
+                    zoomContainer.style.transformOrigin = 'top left';
+                }
+            }
+        }
+
+        // 初期化処理を更新
+        document.addEventListener('DOMContentLoaded', function() {
+            // 既存のinit関数実行後、ズーム機能をセットアップ
+            setTimeout(function() {
+                setupZoomFeature();
+                
+                // タブ切り替え時にもズーム機能を正しく適用
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        // 少し遅延させてズーム機能を再セットアップ
+                        setTimeout(setupZoomFeature, 100);
+                    });
+                });
+            }, 300);  // 既存の初期化が完了するのを待つ
+        });
+
+        // 既存のinitまたはDOMContentLoadedイベントリスナーに追加
+        document.addEventListener('DOMContentLoaded', function() {
+            // 既存の初期化
+            init();
+            
+            // ズーム機能のセットアップ
+            setupZoomFeature();
+        });
+
+        // DOM読み込み完了時に実行するイベントリスナーに追加
+        document.addEventListener('DOMContentLoaded', function() {
+            // 既存の初期化処理
+            init();
+            
+            // ズーム機能のセットアップ
+            setupZoomFeature();
+        });
 
         // リサイズ時にも対応
         window.addEventListener('resize', function() {
