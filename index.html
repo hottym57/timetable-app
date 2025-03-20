@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>大学4年生 時間割表</title>
+    <title>東工大生のための時間割表</title>
     <!-- 以下のPWA関連のメタタグとリンクを追加 -->
     <meta name="theme-color" content="#3f51b5">
     <meta name="description" content="大学4年生のための時間割管理アプリ">
@@ -1035,7 +1035,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>大学4年生 時間割表</h1>
+        <h1>東工大生のための時間割表</h1>
         
         <div class="legend">
             <div class="legend-item">
@@ -1720,6 +1720,9 @@
                         });
                     });
                 });
+                
+                // レンダリング後にイベントハンドラを再設定
+                setupSubjectCells();
             }
 
             // 複数時限セルの作成（完全に書き直し）
@@ -1870,11 +1873,6 @@
                 // 親セルにコンテナへの参照を保存
                 parentCell.multiCellContainer = container;
             }
-            // DOM読み込み完了時に実行
-            document.addEventListener('DOMContentLoaded', function() {
-                // 初期化
-                init();
-            });
 
             // セルのパディングを統一する
             function normalizeTableCellPadding() {
@@ -1920,7 +1918,13 @@
                 const tabs = document.querySelectorAll('.tab');
                 
                 tabs.forEach(tab => {
-                    tab.addEventListener('click', function() {
+                    // 既存のイベントリスナーをクリア（重複防止）
+                    const newTab = tab.cloneNode(true);
+                    if (tab.parentNode) {
+                        tab.parentNode.replaceChild(newTab, tab);
+                    }
+                    
+                    newTab.addEventListener('click', function() {
                         // すべてのタブとコンテンツから active クラスを削除
                         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                         document.querySelectorAll('.quarter-content').forEach(c => c.classList.remove('active'));
@@ -1938,6 +1942,21 @@
                             currentOptions.remove();
                             currentOptions = null;
                         }
+                        
+                        // ズームレベルを適用
+                        setTimeout(() => {
+                            const zoomLevel = document.querySelector('.zoom-level');
+                            if (zoomLevel) {
+                                const scale = parseInt(zoomLevel.textContent) / 100;
+                                const activeQuarter = document.querySelector('.quarter-content.active');
+                                const zoomContainer = activeQuarter?.querySelector('.timetable-zoom');
+                                
+                                if (zoomContainer) {
+                                    zoomContainer.style.transform = `scale(${scale})`;
+                                    zoomContainer.style.transformOrigin = 'center top';
+                                }
+                            }
+                        }, 50);
                     });
                 });
             }
@@ -1947,8 +1966,14 @@
                 const subjects = document.querySelectorAll('.subject');
                 
                 subjects.forEach(subject => {
+                    // 既存のイベントリスナーをクリア（重複防止）
+                    const newSubject = subject.cloneNode(true);
+                    if (subject.parentNode) {
+                        subject.parentNode.replaceChild(newSubject, subject);
+                    }
+                    
                     // クリックイベントリスナーを追加
-                    subject.addEventListener('click', function(event) {
+                    newSubject.addEventListener('click', function(event) {
                         event.stopPropagation();
                         
                         // クリックされたセルを記録
@@ -1967,6 +1992,7 @@
             // 保存済み科目選択の設定
             function setupSavedSubjectsSelect() {
                 const select = document.getElementById('savedSubjects');
+                if (!select) return;
                 
                 // 選択変更イベント
                 select.addEventListener('change', function() {
@@ -1989,19 +2015,31 @@
                 // 保存ボタン
                 const saveButton = document.getElementById('saveSubject');
                 if (saveButton) {
-                    saveButton.addEventListener('click', saveSubject);
+                    // 既存のイベントリスナーをクリア（重複防止）
+                    const newSaveButton = saveButton.cloneNode(true);
+                    saveButton.parentNode.replaceChild(newSaveButton, saveButton);
+                    
+                    newSaveButton.addEventListener('click', saveSubject);
                 }
                 
                 // キャンセルボタン
                 const cancelButton = document.getElementById('cancelSubject');
                 if (cancelButton) {
-                    cancelButton.addEventListener('click', closeSubjectForm);
+                    // 既存のイベントリスナーをクリア（重複防止）
+                    const newCancelButton = cancelButton.cloneNode(true);
+                    cancelButton.parentNode.replaceChild(newCancelButton, cancelButton);
+                    
+                    newCancelButton.addEventListener('click', closeSubjectForm);
                 }
                 
                 // オーバーレイクリックでフォームを閉じる
                 const overlay = document.getElementById('overlay');
                 if (overlay) {
-                    overlay.addEventListener('click', function(e) {
+                    // 既存のイベントリスナーをクリア（重複防止）
+                    const newOverlay = overlay.cloneNode(true);
+                    overlay.parentNode.replaceChild(newOverlay, overlay);
+                    
+                    newOverlay.addEventListener('click', function(e) {
                         if (e.target === this) {
                             closeSubjectForm();
                         }
@@ -2012,6 +2050,7 @@
             // 保存済み科目リストを更新
             function updateSavedSubjectsSelect() {
                 const select = document.getElementById('savedSubjects');
+                if (!select) return;
                 
                 // 既存のオプションをクリア（最初のオプションを除く）
                 while (select.options.length > 1) {
@@ -2372,6 +2411,9 @@
                 
                 // ローカルストレージにデータを保存
                 saveAllTimetableData();
+                
+                // 科目セルのイベントハンドラーを再設定
+                setupSubjectCells();
             }
 
             // 科目を削除
@@ -2447,6 +2489,9 @@
                     
                     // データを保存
                     saveAllTimetableData();
+                    
+                    // 科目セルのイベントハンドラーを再設定
+                    setupSubjectCells();
                 }
             }
             
@@ -2489,6 +2534,13 @@
                     roomElement.style.maxWidth = '90%';
                     cell.appendChild(roomElement);
                 }
+                
+                // セルにクリックイベントを追加
+                cell.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    currentCell = this;
+                    showOptions(this);
+                });
             }
             
             // 同じ名前の科目をすべて更新
@@ -2622,174 +2674,115 @@
                     initScheduleMap(); // エラー時も初期化
                 }
             }
-        })();
-
-        // モバイル対応のためのコード
-        function setupResponsiveFeatures() {
-            // ビューポートの幅を取得
-            const viewportWidth = window.innerWidth;
             
-            // モバイルサイズ（768px以下）の場合の調整
-            if (viewportWidth <= 768) {
-                // フォームの位置調整
-                adjustFormPositionForMobile();
-                
-                // 時間割の高さを調整
-                adjustSubjectCellHeight();
-            }
-        }
-
-        // モバイルデバイスでのフォーム位置調整
-        function adjustFormPositionForMobile() {
-            const form = document.getElementById('subjectForm');
-            if (!form) return;
-            
-            // フォームが表示されたときの処理
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.attributeName === 'class' && 
-                        !form.classList.contains('hidden')) {
-                        
-                        // スクロール位置を上部に
-                        window.scrollTo(0, 0);
-                        
-                        // フォームのスタイル調整
-                        form.style.height = 'auto';
-                        form.style.maxHeight = '90vh';
-                        form.style.overflowY = 'auto';
+            // ズーム機能の実装
+            function setupZoomFeature() {
+                // 既存のズームコントロールのコンテナを削除（重複防止）
+                const existingContainers = document.querySelectorAll('.timetable-container');
+                existingContainers.forEach(el => {
+                    // removeではなくinnerHTMLを空にする
+                    if (!el.querySelector('.quarter-content')) {
+                        el.innerHTML = '';
                     }
                 });
-            });
-            
-            observer.observe(form, { attributes: true });
-        }
-
-        // 画面サイズに合わせて科目セルの高さを調整
-        function adjustSubjectCellHeight() {
-            const subjects = document.querySelectorAll('.subject');
-            const viewportWidth = window.innerWidth;
-            
-            // 画面サイズに応じて高さを決定
-            let cellHeight = '60px';
-            if (viewportWidth <= 480) {
-                cellHeight = '60px';
-            } else if (viewportWidth <= 768) {
-                cellHeight = '70px';
-            }
-            
-            subjects.forEach(subject => {
-                subject.style.minHeight = cellHeight;
-            });
-        }
-
-        // ズーム機能の実装
-        function setupZoomFeature() {
-            // 既存のズームコントロールを削除（重複防止）
-            document.querySelectorAll('.zoom-controls, .timetable-container').forEach(el => {
-                el.remove();
-            });
-
-            // 各クォーターコンテンツにズームコントロールとコンテナを追加
-            document.querySelectorAll('.quarter-content').forEach(quarter => {
-                // クォーター番号を取得
-                const quarterNum = quarter.id.replace('quarter', '');
                 
-                // 既存のテーブルを取得
-                const existingTable = quarter.querySelector('table');
-                if (!existingTable) return;
-                
-                // ズームコントロールを作成
-                const zoomControls = document.createElement('div');
-                zoomControls.className = 'zoom-controls';
-                zoomControls.innerHTML = `
-                    <button class="zoom-btn zoom-out" data-quarter="${quarterNum}" title="縮小">-</button>
-                    <div class="zoom-level" data-quarter="${quarterNum}">100%</div>
-                    <button class="zoom-btn zoom-in" data-quarter="${quarterNum}" title="拡大">+</button>
-                    <button class="zoom-reset" data-quarter="${quarterNum}" title="リセット">リセット</button>
-                `;
-                
-                // テーブルを一時的に保存
-                const tableHTML = existingTable.outerHTML;
-                
-                // 既存のテーブルを削除
-                existingTable.remove();
-                
-                // コンテナを作成
-                const container = document.createElement('div');
-                container.className = 'timetable-container';
-                
-                // ズーム用の内部コンテナを作成
-                const zoomContainer = document.createElement('div');
-                zoomContainer.className = 'timetable-zoom';
-                zoomContainer.setAttribute('data-quarter', quarterNum);
-                
-                // 新しいテーブルを作成して追加
-                zoomContainer.innerHTML = tableHTML;
-                
-                // 要素を配置
-                container.appendChild(zoomContainer);
-                
-                // 要素をクォーターに追加
-                quarter.appendChild(zoomControls);
-                quarter.appendChild(container);
-            });
-
-            // ズーム状態を管理する変数
-            const zoomState = {
-                levels: {1: 100, 2: 100, 3: 100, 4: 100}, // 各クォーターごとのズームレベル
-                min: 50,
-                max: 200,
-                step: 10
-            };
-
-            // ズームイベントハンドラーの設定 - 拡大ボタン
-            document.querySelectorAll('.zoom-btn.zoom-in').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const quarterNum = this.getAttribute('data-quarter');
+                // 各クォーターコンテンツに対してテーブルコンテナを作成
+                document.querySelectorAll('.quarter-content').forEach(quarter => {
+                    // クォーター番号を取得
+                    const quarterNum = quarter.id.replace('quarter', '');
                     
-                    if (zoomState.levels[quarterNum] < zoomState.max) {
-                        zoomState.levels[quarterNum] += zoomState.step;
-                        updateZoom(quarterNum);
+                    // 既存のテーブルを取得
+                    const existingTable = quarter.querySelector('table');
+                    if (!existingTable) return;
+                    
+                    // テーブルを一時的に保存
+                    const tableHTML = existingTable.outerHTML;
+                    
+                    // 既存のテーブルを削除
+                    existingTable.remove();
+                    
+                    // コンテナを作成
+                    const container = document.createElement('div');
+                    container.className = 'timetable-container';
+                    
+                    // ズーム用の内部コンテナを作成
+                    const zoomContainer = document.createElement('div');
+                    zoomContainer.className = 'timetable-zoom';
+                    zoomContainer.setAttribute('data-quarter', quarterNum);
+                    
+                    // 新しいテーブルを作成して追加
+                    zoomContainer.innerHTML = tableHTML;
+                    
+                    // 要素を配置
+                    container.appendChild(zoomContainer);
+                    
+                    // 要素をクォーターに追加
+                    quarter.appendChild(container);
+                });
+
+                // ズーム状態を管理する変数
+                const zoomState = {
+                    level: 80, // デフォルトは80%に縮小
+                    min: 50,
+                    max: 200,
+                    step: 10
+                };
+
+                // ズームイベントハンドラーの設定
+                const setupZoomButtons = function() {
+                    // 拡大ボタン
+                    const zoomInButton = document.querySelector('.zoom-btn.zoom-in');
+                    if (zoomInButton) {
+                        zoomInButton.addEventListener('click', function() {
+                            if (zoomState.level < zoomState.max) {
+                                zoomState.level += zoomState.step;
+                                updateZoom();
+                            }
+                        });
                     }
-                });
-            });
 
-            // 縮小ボタン
-            document.querySelectorAll('.zoom-btn.zoom-out').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const quarterNum = this.getAttribute('data-quarter');
-                    
-                    if (zoomState.levels[quarterNum] > zoomState.min) {
-                        zoomState.levels[quarterNum] -= zoomState.step;
-                        updateZoom(quarterNum);
+                    // 縮小ボタン
+                    const zoomOutButton = document.querySelector('.zoom-btn.zoom-out');
+                    if (zoomOutButton) {
+                        zoomOutButton.addEventListener('click', function() {
+                            if (zoomState.level > zoomState.min) {
+                                zoomState.level -= zoomState.step;
+                                updateZoom();
+                            }
+                        });
                     }
-                });
-            });
 
-            // リセットボタン
-            document.querySelectorAll('.zoom-reset').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const quarterNum = this.getAttribute('data-quarter');
+                    // リセットボタン
+                    const resetButton = document.querySelector('.zoom-reset');
+                    if (resetButton) {
+                        resetButton.addEventListener('click', function() {
+                            zoomState.level = 100;
+                            updateZoom();
+                        });
+                    }
+                };
+                
+                // ズームボタンのイベントハンドラーを設定
+                setupZoomButtons();
+
+                // ズームレベルの更新とスタイルの適用
+                function updateZoom() {
+                    const scale = zoomState.level / 100;
                     
-                    zoomState.levels[quarterNum] = 100;
-                    updateZoom(quarterNum);
-                });
-            });
-
-            // ズームレベルの更新とスタイルの適用
-            function updateZoom(quarterNum) {
-                const scale = zoomState.levels[quarterNum] / 100;
-                const quarter = document.getElementById(`quarter${quarterNum}`);
-                
-                // ズームレベル表示を更新
-                const levelDisplay = quarter.querySelector('.zoom-level');
-                if (levelDisplay) {
-                    levelDisplay.textContent = `${zoomState.levels[quarterNum]}%`;
-                }
-                
-                // テーブルのズームを更新
-                const zoomContainer = quarter.querySelector('.timetable-zoom');
-                if (zoomContainer) {
+                    // ズームレベル表示を更新
+                    const levelDisplay = document.querySelector('.zoom-level');
+                    if (levelDisplay) {
+                        levelDisplay.textContent = `${zoomState.level}%`;
+                    }
+                    
+                    // 現在アクティブなクォーターのテーブルを更新
+                    const activeQuarter = document.querySelector('.quarter-content.active');
+                    if (!activeQuarter) return;
+                    
+                    const zoomContainer = activeQuarter.querySelector('.timetable-zoom');
+                    if (!zoomContainer) return;
+                    
+                    // スケールを適用
                     zoomContainer.style.transform = `scale(${scale})`;
                     
                     // コンテナの幅と高さを調整
@@ -2797,84 +2790,452 @@
                     const table = zoomContainer.querySelector('table');
                     
                     if (table && container) {
-                        // 拡大時は余白を増やす
-                        if (scale > 1) {
-                            const width = table.offsetWidth * scale;
-                            const height = table.offsetHeight * scale;
-                            zoomContainer.style.width = `${table.offsetWidth}px`;
-                            zoomContainer.style.height = `${table.offsetHeight}px`;
-                            container.style.minWidth = `${Math.min(width, window.innerWidth - 30)}px`;
-                            container.style.minHeight = `${height}px`;
-                        }
-                        // 縮小時は元のサイズに近づける
-                        else {
-                            zoomContainer.style.width = `${table.offsetWidth}px`;
-                            zoomContainer.style.height = `${table.offsetHeight}px`;
-                            container.style.minWidth = '';
-                            container.style.minHeight = '';
-                        }
+                        // テーブルの初期サイズを保存
+                        zoomContainer.style.width = `${table.offsetWidth}px`;
+                        zoomContainer.style.height = `${table.offsetHeight}px`;
+                        
+                        // コンテナサイズの調整
+                        const width = Math.max(table.offsetWidth * scale, container.offsetWidth);
+                        container.style.minWidth = '';
+                        container.style.minHeight = '';
                     }
                     
-                    // 変形の原点を設定
-                    zoomContainer.style.transformOrigin = 'top left';
+                    // 中央揃えに設定
+                    zoomContainer.style.transformOrigin = 'center top';
+                }
+                
+                // 初期化時にアクティブなクォーターにスケールを適用
+                updateZoom();
+            }
+
+            // モバイル対応のためのコード
+            function setupResponsiveFeatures() {
+                // ビューポートの幅を取得
+                const viewportWidth = window.innerWidth;
+                
+                // モバイルサイズ（768px以下）の場合の調整
+                if (viewportWidth <= 768) {
+                    // フォームの位置調整
+                    adjustFormPositionForMobile();
+                    
+                    // 時間割の高さを調整
+                    adjustSubjectCellHeight();
                 }
             }
-        }
 
-        // 初期化処理を更新
-        document.addEventListener('DOMContentLoaded', function() {
-            // 既存のinit関数実行後、ズーム機能をセットアップ
-            setTimeout(function() {
-                setupZoomFeature();
+            // モバイルデバイスでのフォーム位置調整
+            function adjustFormPositionForMobile() {
+                const form = document.getElementById('subjectForm');
+                if (!form) return;
                 
-                // タブ切り替え時にもズーム機能を正しく適用
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.addEventListener('click', function() {
-                        // 少し遅延させてズーム機能を再セットアップ
-                        setTimeout(setupZoomFeature, 100);
+                // フォームが表示されたときの処理
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.attributeName === 'class' && 
+                            !form.classList.contains('hidden')) {
+                            
+                            // スクロール位置を上部に
+                            window.scrollTo(0, 0);
+                            
+                            // フォームのスタイル調整
+                            form.style.height = 'auto';
+                            form.style.maxHeight = '90vh';
+                            form.style.overflowY = 'auto';
+                        }
                     });
                 });
-            }, 300);  // 既存の初期化が完了するのを待つ
-        });
+                
+                observer.observe(form, { attributes: true });
+            }
 
-        // 既存のinitまたはDOMContentLoadedイベントリスナーに追加
-        document.addEventListener('DOMContentLoaded', function() {
-            // 既存の初期化
-            init();
+            // 画面サイズに合わせて科目セルの高さを調整
+            function adjustSubjectCellHeight() {
+                const subjects = document.querySelectorAll('.subject');
+                const viewportWidth = window.innerWidth;
+                
+                // 画面サイズに応じて高さを決定
+                let cellHeight = '60px';
+                if (viewportWidth <= 480) {
+                    cellHeight = '60px';
+                } else if (viewportWidth <= 768) {
+                    cellHeight = '70px';
+                }
+                
+                subjects.forEach(subject => {
+                    subject.style.minHeight = cellHeight;
+                });
+            }
+
+            // タブ切り替え時のイベントハンドラー拡張
+            function enhanceTabSwitching() {
+                document.querySelectorAll('.tab').forEach(tab => {
+                    // すでに設定されているリスナーがあるため、
+                    // ここでは何もしない（setupTabs関数で対応）
+                });
+            }
+
+            // CSS スタイルの追加
+            function addZoomStyles() {
+                // 既存のスタイル要素を確認
+                const existingStyle = document.getElementById('dynamic-zoom-styles');
+                if (existingStyle) {
+                    existingStyle.remove();
+                }
+
+                // 新しいスタイル要素を作成
+                const styleElement = document.createElement('style');
+                styleElement.id = 'dynamic-zoom-styles';
+                styleElement.textContent = `
+                    /* ズームコントロール用のスタイル更新 */
+                    .zoom-controls {
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                        margin-left: auto;
+                        padding: 0 10px;
+                    }
+
+                    .zoom-btn {
+                        background: linear-gradient(to bottom, #3949ab, #303f9f);
+                        color: white;
+                        border: none;
+                        border-radius: 50%;
+                        width: 24px;
+                        height: 24px;
+                        font-size: 14px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        transition: all 0.2s ease;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                    }
+
+                    .zoom-btn:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+                    }
+
+                    .zoom-btn:active {
+                        transform: translateY(0);
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                    }
+
+                    .zoom-level {
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: #333;
+                        min-width: 40px;
+                        text-align: center;
+                    }
+
+                    .zoom-reset {
+                        background: linear-gradient(to bottom, #f5f5f5, #e0e0e0);
+                        color: #333;
+                        border: none;
+                        border-radius: 4px;
+                        padding: 2px 8px;
+                        font-size: 11px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    }
+
+                    .zoom-reset:hover {
+                        background: linear-gradient(to bottom, #eeeeee, #d5d5d5);
+                    }
+
+                    /* レスポンシブ対応 */
+                    @media screen and (max-width: 768px) {
+                        .zoom-controls {
+                            gap: 4px;
+                            padding: 0 5px;
+                        }
+                        
+                        .zoom-btn {
+                            width: 20px;
+                            height: 20px;
+                            font-size: 12px;
+                        }
+                        
+                        .zoom-level {
+                            font-size: 11px;
+                            min-width: 32px;
+                        }
+                        
+                        .zoom-reset {
+                            font-size: 10px;
+                            padding: 1px 5px;
+                        }
+                    }
+                `;
+                document.head.appendChild(styleElement);
+            }
+
+            function addLayoutStyles() {
+            // 既存のスタイル要素を確認
+            const existingStyle = document.getElementById('dynamic-layout-styles');
+            if (existingStyle) {
+                existingStyle.remove();
+            }
+
+            const styleElement = document.createElement('style');
+            styleElement.id = 'dynamic-layout-styles';
+            styleElement.textContent = `
+                /* 全体のコンテナスタイル調整 */
+                .container {
+                    position: relative;
+                }
+                
+                /* 凡例とタブ・ズームコントロールのエリア */
+                .controls-area {
+                    display: flex;
+                    justify-content: center; /* 中央揃えに変更 */
+                    align-items: center;
+                    margin: 10px 0;
+                    width: 100%;
+                    flex-wrap: wrap; /* 必要に応じて折り返し */
+                }
+                
+                /* 凡例コンテナをインライン化 */
+                .legend {
+                    display: flex;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                    gap: 5px;
+                    margin: 0;
+                    padding: 5px 10px;
+                }
+                
+                .legend-item {
+                    margin: 0 2px;
+                }
+                
+                /* タブとズームを並べて配置するコンテナ */
+                .tabs-zoom-container {
+                    display: flex;
+                    align-items: center;
+                    background: white;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    overflow: hidden;
+                    margin-left: 10px;
+                }
+                
+                /* タブのスタイル調整 */
+                .tabs {
+                    display: flex;
+                    margin: 0;
+                    box-shadow: none;
+                    border-radius: 0;
+                }
+                
+                /* タブをコンパクトに */
+                .tab {
+                    padding: 6px 12px;
+                    margin: 0;
+                    border-radius: 0;
+                    font-size: 0.9em;
+                }
+                
+                /* ズームコントロールのスタイル */
+                .zoom-controls {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    padding: 0 8px;
+                    border-left: 1px solid rgba(0,0,0,0.05);
+                    height: 100%;
+                }
+                
+                .zoom-btn {
+                    width: 22px;
+                    height: 22px;
+                    font-size: 12px;
+                }
+                
+                .zoom-level {
+                    font-size: 12px;
+                    min-width: 36px;
+                }
+                
+                .zoom-reset {
+                    font-size: 10px;
+                    padding: 2px 6px;
+                }
+                
+                /* レスポンシブ対応 */
+                @media screen and (max-width: 768px) {
+                    .controls-area {
+                        flex-direction: column;
+                        gap: 10px;
+                    }
+                    
+                    .legend {
+                        width: 100%;
+                        justify-content: center;
+                    }
+                    
+                    .tabs-zoom-container {
+                        margin-left: 0;
+                        width: auto;
+                        max-width: 100%;
+                    }
+                }
+            `;
+            document.head.appendChild(styleElement);
+        }
+
+            // DOM構造を再構築
+            function restructureLayout() {
+                // 凡例を取得
+                const legend = document.querySelector('.legend');
+                // タブを取得
+                const tabs = document.querySelector('.tabs');
+                
+                if (!legend || !tabs) return;
+                
+                // 親コンテナを取得
+                const container = legend.closest('.container');
+                if (!container) return;
+                
+                // 既存のコントロールエリアがあれば削除
+                const existingControlsArea = container.querySelector('.controls-area');
+                if (existingControlsArea) {
+                    existingControlsArea.remove();
+                }
+                
+                // 新しいコントロールエリアを作成
+                const controlsArea = document.createElement('div');
+                controlsArea.className = 'controls-area';
+                
+                // タブとズームを収めるコンテナ
+                const tabsZoomContainer = document.createElement('div');
+                tabsZoomContainer.className = 'tabs-zoom-container';
+                
+                // ズームコントロールを作成
+                const zoomControls = document.createElement('div');
+                zoomControls.className = 'zoom-controls';
+                zoomControls.innerHTML = `
+                    <button class="zoom-btn zoom-out" title="縮小">-</button>
+                    <div class="zoom-level">80%</div>
+                    <button class="zoom-btn zoom-in" title="拡大">+</button>
+                    <button class="zoom-reset" title="リセット">リセット</button>
+                `;
+                
+                // クローンを作成して元のイベントリスナーを保持しないようにする
+                const legendClone = legend.cloneNode(true);
+                const tabsClone = tabs.cloneNode(true);
+                
+                // 新しい構造に組み立て
+                tabsZoomContainer.appendChild(tabsClone);
+                tabsZoomContainer.appendChild(zoomControls);
+                
+                // コントロールエリアに要素を追加
+                controlsArea.appendChild(legendClone);
+                controlsArea.appendChild(tabsZoomContainer);
+                
+                // h1の後に挿入
+                const h1 = container.querySelector('h1');
+                if (h1) {
+                    container.insertBefore(controlsArea, h1.nextSibling);
+                } else {
+                    container.prepend(controlsArea);
+                }
+                
+                // 元の凡例とタブを非表示にする
+                legend.style.display = 'none';
+                tabs.style.display = 'none';
+                
+                // タブとズームボタンのイベントを再設定
+                setupTabs();
+                
+                // ズームボタンのイベントを設定
+                const zoomInBtn = zoomControls.querySelector('.zoom-btn.zoom-in');
+                const zoomOutBtn = zoomControls.querySelector('.zoom-btn.zoom-out');
+                const zoomResetBtn = zoomControls.querySelector('.zoom-reset');
+                const zoomLevel = zoomControls.querySelector('.zoom-level');
+                
+                if (zoomInBtn && zoomOutBtn && zoomResetBtn && zoomLevel) {
+                    // ズーム状態管理変数
+                    const zoomState = {
+                        level: 80,
+                        min: 50,
+                        max: 200,
+                        step: 10
+                    };
+                    
+                    // 拡大ボタン
+                    zoomInBtn.addEventListener('click', function() {
+                        if (zoomState.level < zoomState.max) {
+                            zoomState.level += zoomState.step;
+                            updateZoomLevel();
+                        }
+                    });
+                    
+                    // 縮小ボタン
+                    zoomOutBtn.addEventListener('click', function() {
+                        if (zoomState.level > zoomState.min) {
+                            zoomState.level -= zoomState.step;
+                            updateZoomLevel();
+                        }
+                    });
+                    
+                    // リセットボタン
+                    zoomResetBtn.addEventListener('click', function() {
+                        zoomState.level = 100;
+                        updateZoomLevel();
+                    });
+                    
+                    // ズームレベル更新関数
+                    function updateZoomLevel() {
+                        zoomLevel.textContent = `${zoomState.level}%`;
+                        
+                        const scale = zoomState.level / 100;
+                        const activeQuarter = document.querySelector('.quarter-content.active');
+                        if (!activeQuarter) return;
+                        
+                        const zoomContainer = activeQuarter.querySelector('.timetable-zoom');
+                        if (!zoomContainer) return;
+                        
+                        zoomContainer.style.transform = `scale(${scale})`;
+                        zoomContainer.style.transformOrigin = 'center top';
+                    }
+                }
+            }
             
-            // ズーム機能のセットアップ
-            setupZoomFeature();
-        });
+            // 初期化処理
+            document.addEventListener('DOMContentLoaded', function() {
+                // 最初にアプリの初期化を行う
+                init();
+                
+                // レイアウト関連の処理はその後に実行
+                setTimeout(function() {
+                    addLayoutStyles();
+                    restructureLayout();
+                    setupZoomFeature();
+                    setupResponsiveFeatures();
+                    
+                    // レイアウト変更後にイベントリスナーを再設定
+                    setupSubjectCells();
+                    setupFormButtons();
+                }, 300);
+            });
 
-        // DOM読み込み完了時に実行するイベントリスナーに追加
-        document.addEventListener('DOMContentLoaded', function() {
-            // 既存の初期化処理
-            init();
-            
-            // ズーム機能のセットアップ
-            setupZoomFeature();
-        });
-
-        // リサイズ時にも対応
-        window.addEventListener('resize', function() {
-            setupResponsiveFeatures();
-        });
-
-        // 初期化処理に追加
-        document.addEventListener('DOMContentLoaded', function() {
-            setupResponsiveFeatures();
-        });
-
-        // 縦向き/横向きの変更を検出
-        window.addEventListener('orientationchange', function() {
-            // 少し遅延させて実行（レイアウト調整のため）
-            setTimeout(function() {
+            // リサイズ時にも対応
+            window.addEventListener('resize', function() {
                 setupResponsiveFeatures();
-            }, 300);
-        });
-    </script>
-    <!-- body終了タグの前に追加 -->
-    <script>
+            });
+
+            // 縦向き/横向きの変更を検出
+            window.addEventListener('orientationchange', function() {
+                // 少し遅延させて実行（レイアウト調整のため）
+                setTimeout(function() {
+                    setupResponsiveFeatures();
+                }, 300);
+            });
+        })();
+
         // Service Workerの登録
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -2897,7 +3258,6 @@
             e.preventDefault();
             // 後で使うためにイベントを保存
             deferredPrompt = e;
-            // インストールボタンを表示するなどの処理をここに追加できます
         });
 
         // インストールボタンクリック時の処理を追加することもできます
